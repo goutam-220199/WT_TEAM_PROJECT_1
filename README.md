@@ -24,8 +24,8 @@ The main objective of this project is to build a functional web application usin
 - HTML
 - CSS
 - JavaScript
-- Backend Technology (Node.js / Python / PHP)
-- Database (MySQL / MongoDB)
+- Backend Technology (Node.js / Express.js)
+- Database (MongoDB)
 - Git & GitHub for Version Control
 
 ---
@@ -86,4 +86,5 @@ Each team member works on separate branches and merges their work into the main 
 ## 📜 License
 
 This project is developed for academic purposes.
+
 
