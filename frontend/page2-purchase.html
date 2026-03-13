@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Invoice - InventoryPro</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <div class="navbar-container">
+            <div class="navbar-logo">
+                <h1 class="logo">InventoryPro</h1>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="page2-dashboard.html" class="nav-link">Dashboard</a></li>
+                <li><a href="page2-suppliers.html" class="nav-link">Suppliers</a></li>
+                <li><a href="page2-purchase.html" class="nav-link active">Purchase Invoice</a></li>
+                <li><a href="page2-invoices.html" class="nav-link">Previous Invoices</a></li>
+                <li><a href="index.html" class="nav-link" onclick="logout(event)">Logout</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="purchase-container">
+            <div class="page-header">
+                <h2>Create Purchase Invoice</h2>
+            </div>
+
+
+            <div class="purchase-form">
+                <div class="form-section">
+                    <h3>Purchase Details</h3>
+                    
+                    <div class="form-group">
+                        <label for="purchaseDate">Invoice Date</label>
+                        <input type="date" id="purchaseDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="supplierSelect">Select Supplier</label>
+                        <select id="supplierSelect" onchange="loadSupplierProducts()" required>
+                            <option value="">Choose a supplier</option>
+                        </select>
+                    </div>
+
+                    <h3 style="margin-top: 20px;">Add Products</h3>
+
+                    <div class="products-list" id="purchaseProductsList">
+                        <div class="product-row">
+                            <select class="product-select" onchange="updateProductPrice(this)">
+                                <option value="">Select Product</option>
+                            </select>
+                            <input type="number" class="product-qty" placeholder="Qty" min="1" onchange="calculatePurchaseTotal()">
+                            <input type="number" class="product-price" placeholder="Price" readonly>
+                            <input type="number" class="product-gst" placeholder="GST %" readonly>
+                            <button type="button" class="btn btn-delete" onclick="removeProductRow(this)">Remove</button>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-secondary" onclick="addPurchaseProductRow()">Add Product Row</button>
+
+                    <div class="invoice-summary">
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span id="purchaseSubtotal">₹0</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>GST:</span>
+                            <span id="purchaseGST">₹0</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total Amount:</span>
+                            <span id="purchaseTotalAmount">₹0</span>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-primary" onclick="createPurchaseInvoice()">Create Invoice</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/navbar.js"></script>
+    <script src="js/page2-purchase.js"></script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suppliers - InventoryPro</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <div class="navbar-container">
+            <div class="navbar-logo">
+                <h1 class="logo">InventoryPro</h1>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="page2-dashboard.html" class="nav-link">Dashboard</a></li>
+                <li><a href="page2-suppliers.html" class="nav-link active">Suppliers</a></li>
+                <li><a href="page2-purchase.html" class="nav-link">Purchase Invoice</a></li>
+                <li><a href="page2-invoices.html" class="nav-link">Previous Invoices</a></li>
+                <li><a href="index.html" class="nav-link" onclick="logout(event)">Logout</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+        <main class="main-content">
+
+            <div class="suppliers-container">
+
+            <div class="page-header">
+            <h2>Suppliers Management</h2>
+            </div>
+
+            <!-- Available Suppliers -->
+            <h3 style="margin-top:20px;">Available Suppliers</h3>
+
+            <div class="suppliers-grid" id="availableSuppliersGrid">
+            <p class="empty-state">No suppliers available</p>
+            </div>
+
+
+            <!-- Approved Suppliers -->
+            <h3 style="margin-top:40px;">Approved Suppliers</h3>
+
+            <div class="suppliers-grid" id="approvedSuppliersGrid">
+            <p class="empty-state">No approved suppliers yet</p>
+            </div>
+
+            </div>
+
+        </main>
+
+    <!-- Supplier Modal -->
+    <!-- <div id="supplierModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSupplierModal()">&times;</span>
+            <h2 id="modalTitle">Add Supplier</h2>
+            
+            <form id="supplierForm">
+                <div class="form-group">
+                    <label for="supplierName">Supplier Name</label>
+                    <input type="text" id="supplierName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="supplierEmail">Email</label>
+                    <input type="email" id="supplierEmail" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="supplierPhone">Phone</label>
+                    <input type="tel" id="supplierPhone" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="supplierAddress">Address</label>
+                    <textarea id="supplierAddress" rows="3" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="supplierCity">City</label>
+                    <input type="text" id="supplierCity" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">RequestSupplier</button>
+            </form>
+        </div>
+    </div> -->
+
+    <!-- Supplier Products Modal -->
+   <div id="productsModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeProductsModal()">&times;</span>
+        <h2>Products from <span id="supplierNameDisplay"></span></h2>
+
+        <div id="supplierProductsList" class="supplier-products">
+            <p class="empty-state">No products available from this supplier</p>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeProductsModal()">Close</button>
+        </div>
+    </div>
+    </div>
+
+    <script src="js/navbar.js"></script>
+    <script src="js/page2-suppliers.js"></script>
+</body>
+</html>

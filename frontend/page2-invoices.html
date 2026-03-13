@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Previous Invoices - InventoryPro</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <div class="navbar-container">
+            <div class="navbar-logo">
+                <h1 class="logo">InventoryPro</h1>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="page2-dashboard.html" class="nav-link">Dashboard</a></li>
+                <li><a href="page2-suppliers.html" class="nav-link">Suppliers</a></li>
+                <li><a href="page2-purchase.html" class="nav-link">Purchase Invoice</a></li>
+                <li><a href="page2-invoices.html" class="nav-link active">Previous Invoices</a></li>
+                <li><a href="index.html" class="nav-link" onclick="logout(event)">Logout</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="invoices-container">
+            <div class="page-header">
+                <h2>Previous Purchase Invoices</h2>
+            </div>
+
+            <div class="invoices-filters">
+                <input type="text" id="searchInvoice" placeholder="Search by invoice ID or supplier name..." onkeyup="searchInvoices()">
+                <select id="invoiceFilter" onchange="filterInvoices()">
+                    <option value="">All Invoices</option>
+                    <option value="">Sort by Date (Newest)</option>
+                    <option value="">Sort by Amount (High to Low)</option>
+                </select>
+            </div>
+
+            <div class="invoices-table" id="invoicesTable">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Invoice ID</th>
+                            <th>Supplier</th>
+                            <th>Date</th>
+                            <th>Total Products</th>
+                            <th>Total Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invoicesBody">
+                        <tr>
+                            <td colspan="6" class="empty-state">No invoices found</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Invoice Details Modal -->
+    <div id="invoiceDetailsModal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close" onclick="closeInvoiceDetails()">&times;</span>
+            <h2>Invoice Details</h2>
+            
+            <div id="invoiceDetailsContent" class="invoice-details">
+                <!-- Populated dynamically -->
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="printInvoice()">Print</button>
+                <button class="btn btn-secondary" onclick="downloadInvoice()">Download PDF</button>
+                <button class="btn btn-secondary" onclick="closeInvoiceDetails()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/navbar.js"></script>
+    <script src="js/page2-invoices.js"></script>
+</body>
+</html>
