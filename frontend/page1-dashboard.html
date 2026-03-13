@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - InventoryPro</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <div class="navbar-container">
+            <div class="navbar-logo">
+                <h1 class="logo">InventoryPro</h1>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="page1-dashboard.html" class="nav-link active">Dashboard</a></li>
+                <li><a href="page1-products.html" class="nav-link">Products</a></li>
+                <li><a href="page1-orders.html" class="nav-link">Orders</a></li>
+                <li><a href="page1-sales.html" class="nav-link">Sales Invoice</a></li>
+                <li><a href="page1-reports.html" class="nav-link">Reports</a></li>
+                <li><a href="page1-notifications.html" class="nav-link">Notifications</a></li>
+                <li><a href="index.html" class="nav-link" onclick="logout(event)">Logout</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="dashboard-container">
+            <div class="page-header">
+                <h2>Dashboard</h2>
+                <p id="userGreeting" class="user-greeting"></p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-content">
+                        <h3>Total Products</h3>
+                        <p class="stat-number" id="totalProducts">0</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-content">
+                        <h3>Total Sales</h3>
+                        <p class="stat-number" id="totalSales">₹0</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-content">
+                        <h3>Total Orders</h3>
+                        <p class="stat-number" id="totalOrders">0</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-content">
+                        <h3>Low Stock Items</h3>
+                        <p class="stat-number" id="lowStockCount">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-content">
+                <div class="recent-sales-section">
+                    <h3>Recent Sales</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Invoice ID</th>
+                                <th>Date</th>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Total Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentSalesBody">
+                            <tr>
+                                <td colspan="5" class="empty-state">No recent sales yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="low-stock-section">
+                    <h3>Low Stock Alerts</h3>
+                    <div id="lowStockAlerts" class="alerts-container">
+                        <p class="empty-state">No low stock items</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="js/navbar.js"></script>
+    <script src="js/page1-dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - InventoryPro</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .quick-stats h3 {
+        letter-spacing: 1px;
+        word-spacing: 3px;
+        margin-bottom: 20px;
+         }
+
+        .overview-card h4 {
+            letter-spacing: 0.8px;
+            word-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .overview-card p {
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <div class="navbar-container">
+            <div class="navbar-logo">
+                <h1 class="logo">InventoryPro</h1>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="page2-dashboard.html" class="nav-link active">Dashboard</a></li>
+                <li><a href="page2-suppliers.html" class="nav-link">Suppliers</a></li>
+                <li><a href="page2-purchase.html" class="nav-link">Purchase Invoice</a></li>
+                <li><a href="page2-invoices.html" class="nav-link">Previous Invoices</a></li>
+                <li><a href="index.html" class="nav-link" onclick="logout(event)">Logout</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="dashboard-container">
+            <div class="page-header">
+                <h2>Dashboard</h2>
+                <p id="userGreeting" class="user-greeting"></p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">🏭</div>
+                    <div class="stat-content">
+                        <h3>Total Suppliers</h3>
+                        <p class="stat-number" id="totalSuppliers">0</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-content">
+                        <h3>Total Products Purchased</h3>
+                        <p class="stat-number" id="totalProductsPurchased">0</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-content">
+                        <h3>Total Spending</h3>
+                        <p class="stat-number" id="totalSpending">₹0</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">📋</div>
+                    <div class="stat-content">
+                        <h3>Total Invoices</h3>
+                        <p class="stat-number" id="totalInvoices">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-content">
+                <div class="recent-purchases-section">
+                    <h3>Recently Purchased Products</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Supplier</th>
+                                <th>Quantity</th>
+                                <th>Purchase Date</th>
+                                <th>Total Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentPurchasesBody">
+                            <tr>
+                                <td colspan="5" class="empty-state">No purchases yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="quick-stats">
+                    <h3>Quick Overview</h3>
+                    <div class="overview-grid">
+                        <div class="overview-card">
+                            <h4>Active Suppliers</h4>
+                            <p id="activeSuppliers">0</p>
+                        </div>
+                        <div class="overview-card">
+                            <h4>Monthly Spending</h4>
+                            <p id="monthlySpending">₹0</p>
+                        </div>
+                        <div class="overview-card">
+                            <h4>Avg Order Value</h4>
+                            <p id="avgOrderValue">₹0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/navbar.js"></script>
+    <script src="js/page2-dashboard.js"></script>
+</body>
+</html>

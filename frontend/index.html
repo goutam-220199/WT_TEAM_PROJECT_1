@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InventoryPro - Login</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body class="login-body">
+
+<div class="auth-page">
+
+   <!-- LEFT SIDE BRAND SECTION -->
+<div class="auth-left">
+
+    <h1 class="logo">InventoryPro</h1>
+
+    <h2>B2B Inventory & Product Management</h2>
+
+    <p>
+        Powerful inventory tracking, supplier management and billing system built for modern businesses.
+    </p>
+
+
+    <!-- INFO BOXES -->
+    <div class="feature-box-container">
+
+        <div class="feature-box">
+            <h3>Smart Inventory Tracking</h3>
+            <p>Monitor stock levels in real time and prevent shortages or overstocking.</p>
+        </div>
+
+        <div class="feature-box">
+            <h3>Supplier Management</h3>
+            <p>Keep supplier records organized and track purchase history easily.</p>
+        </div>
+
+        <div class="feature-box">
+            <h3>Instant Invoice Generation</h3>
+            <p>Create professional invoices and share them with clients instantly.</p>
+        </div>
+
+    </div>
+
+</div>
+
+    <!-- RIGHT SIDE FORM SECTION -->
+    <div class="auth-right">
+
+        <!-- TOP TOGGLE BUTTONS -->
+        <div class="auth-toggle">
+            <button id="loginBtn" class="auth-tab active" onclick="showLogin()">Login</button>
+            <button id="registerBtn" class="auth-tab" onclick="showRegister()">Register</button>
+        </div>
+
+
+        <!-- LOGIN FORM -->
+        <form id="loginForm" class="auth-form active">
+
+            <h2>Login</h2>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="loginEmail" placeholder="Enter your email" required>
+                <span class="error-msg" id="loginEmailError"></span>
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                <span class="error-msg" id="loginPasswordError"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Login</button>
+            <button type="button" class="btn btn-primary">Login With Google</button>
+        </form>
+
+
+        <!-- REGISTER FORM -->
+        <form id="registerForm" class="auth-form">
+
+            <h2>Register</h2>
+
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="registerName" placeholder="Enter your full name" required>
+                <span class="error-msg" id="registerNameError"></span>
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="registerEmail" placeholder="Enter your email" required>
+                <span class="error-msg" id="registerEmailError"></span>
+            </div>
+
+            <div class="form-group">
+                <label>Role</label>
+                <select id="registerRole" required>
+                    <option value="">Select your role</option>
+                    <option value="wholesaler">Wholesaler</option>
+                    <option value="retailer">Retailer</option>
+                    <option value="small-scale">Small Scale Business Owner</option>
+                    <option value="distributor">Distributor</option>
+                    <option value="manufacturer">Manufacturer</option>
+                </select>
+                <span class="error-msg" id="registerRoleError"></span>
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="registerPassword" placeholder="Minimum 6 characters" required>
+                <span class="error-msg" id="registerPasswordError"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Register</button>
+            <button type="button" class="btn btn-primary">Login With Google</button>
+
+
+        </form>
+
+
+
+
+<script src="js/auth.js"></script>
+
+<script>
+
+function showLogin(){
+
+document.getElementById("loginForm").classList.add("active");
+document.getElementById("registerForm").classList.remove("active");
+
+document.getElementById("loginBtn").classList.add("active");
+document.getElementById("registerBtn").classList.remove("active");
+
+}
+
+function showRegister(){
+
+document.getElementById("registerForm").classList.add("active");
+document.getElementById("loginForm").classList.remove("active");
+
+document.getElementById("registerBtn").classList.add("active");
+document.getElementById("loginBtn").classList.remove("active");
+
+}
+
+</script>
+
+</body>
+</html>
