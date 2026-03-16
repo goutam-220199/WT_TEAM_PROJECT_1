@@ -14,16 +14,32 @@ headers:{ Authorization:"Bearer "+token }
 
 const suppliers = await res.json();
 
+// Remove suppliers that have already been requested/approved
+const requestsRes = await fetch(
+  "http://localhost:5000/api/supplier-request/my-requests",
+  {
+    headers:{ Authorization:"Bearer "+token }
+  }
+);
+const requests = await requestsRes.json();
+const excludedSupplierIds = (requests || [])
+  .filter(r => r.status === 'pending' || r.status === 'approved')
+  .map(r => (r.supplier?._id || r.supplier || '').toString());
+
+const availableSuppliers = (suppliers || []).filter(
+  s => !excludedSupplierIds.includes(s._id.toString())
+);
+
 const grid = document.getElementById("availableSuppliersGrid");
 
-if(!suppliers.length){
+if(!availableSuppliers.length){
 
-grid.innerHTML = '<p class="empty-state">No suppliers available</p>';
-return;
+  grid.innerHTML = '<p class="empty-state">No suppliers available</p>';
+  return;
 
 }
 
-grid.innerHTML = suppliers.map(s=>`
+grid.innerHTML = availableSuppliers.map(s=>`
 
 <div class="supplier-card" id="supplier-${s._id}">
 
@@ -82,7 +98,7 @@ grid.innerHTML = data.map(req=>`
 <div class="supplier-actions">
 
 <button class="btn btn-secondary"
-onclick="viewSupplierProducts('${req.supplier._id}')">
+onclick="viewSupplierProducts('${req.supplier?._id || req.supplier}')">
 View Products
 </button>
 
@@ -107,31 +123,56 @@ Remove Supplier
    Request Supplier
 -----------------------------*/
 async function requestSupplier(supplierId){
+  const token = localStorage.getItem("token");
 
-const token = localStorage.getItem("token");
+  // Check if already requested
+  try {
+    const requestsRes = await fetch(
+      "http://localhost:5000/api/supplier-request/my-requests",
+      {
+        headers:{ Authorization:"Bearer "+token }
+      }
+    );
+    const requests = await requestsRes.json();
+    const alreadyRequested = (requests || []).some(r => r.supplier?._id === supplierId || r.supplier === supplierId);
 
-const res = await fetch(
-"http://localhost:5000/api/supplier-request",
-{
-method:"POST",
-headers:{
-"Content-Type":"application/json",
-Authorization:"Bearer "+token
-},
-body:JSON.stringify({ supplierId })
-});
+    if (alreadyRequested) {
+      showToast("You have already requested this supplier", "error");
+      return;
+    }
+  } catch (err) {
+    console.error("Failed to check existing requests", err);
+  }
 
-const data = await res.json();
+  const res = await fetch(
+    "http://localhost:5000/api/supplier-request",
+    {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        Authorization:"Bearer "+token
+      },
+      body:JSON.stringify({ supplierId })
+    }
+  );
 
-showToast(data.message || "Request sent");
+  const data = await res.json();
 
+  if (!res.ok) {
+    showToast(data.message || "Failed to send request", "error");
+    console.error("Supplier request failed", data);
+    return;
+  }
 
-// remove supplier card immediately
-const card = document.getElementById(`supplier-${supplierId}`);
-if(card){
-card.remove();
-}
+  showToast(data.message || "Request sent");
 
+  // remove supplier card immediately
+  const card = document.getElementById(`supplier-${supplierId}`);
+  if(card){
+    card.remove();
+  }
+
+  // note: the supplier will see this request on their notifications page
 }
 
 
@@ -141,8 +182,9 @@ card.remove();
 -----------------------------*/
 
 async function viewSupplierProducts(supplierId){
+  const token = localStorage.getItem("token");
 
-const token = localStorage.getItem("token");
+  try {
 
 const res = await fetch(
 `http://localhost:5000/api/products/by-supplier/${supplierId}`,
@@ -152,13 +194,16 @@ headers:{ Authorization:"Bearer "+token }
 
 const products = await res.json();
 
-const productsList = document.getElementById("supplierProductsList");
+    console.log("[Suppliers] viewSupplierProducts", { supplierId, productsCount: products?.length, products: products?.slice(0, 3) }); // log first 3 products
 
-if(!products || products.length === 0){
+    const productsList = document.getElementById("supplierProductsList");
 
-productsList.innerHTML =
-'<p class="empty-state">No products available from this supplier</p>';
+    if(!productsList) {
+      console.error("[Suppliers] productsList element not found");
+      return;
+    }
 
+    if(!products || products.length === 0){
 openModal("productsModal");
 
 return;
@@ -184,7 +229,7 @@ GST: ${product.gst}% | Stock: ${product.stock}
 </div>
 
 <button class="btn btn-primary"
-onclick="addToCart('${product.owner}','${product.name}','${product.price}','${product.gst}')">
+onclick="addToCart('${product._id}','${product.owner}','${product.name}','${product.price}','${product.gst}','${product.stock}')">
 Add to Cart
 </button>
 
@@ -194,6 +239,14 @@ Add to Cart
 
 openModal("productsModal");
 
+  } catch (err) {
+    console.error("[Suppliers] viewSupplierProducts error", err);
+    const productsList = document.getElementById("supplierProductsList");
+    if (productsList) {
+      productsList.innerHTML = '<p class="empty-state">Unable to load products</p>';
+      openModal("productsModal");
+    }
+  }
 }
 
 
@@ -214,40 +267,47 @@ closeModal("productsModal");
    Add Product To Cart
 -----------------------------*/
 
-async function addToCart(supplier,name,price,gst){
+async function addToCart(productId, supplierId, name, price, gst, stock){
+  const token = localStorage.getItem("token");
 
-const token = localStorage.getItem("token");
+  // Ensure supplier is approved
+  const res = await fetch(
+    "http://localhost:5000/api/supplier-request/approved",
+    {
+      headers:{ Authorization:"Bearer "+token }
+    }
+  );
 
-const res = await fetch(
-"http://localhost:5000/api/supplier-request/approved",
-{
-headers:{ Authorization:"Bearer "+token }
-});
+  const approved = await res.json();
+  const allowed = approved.some(s => s.supplier._id === supplierId);
 
-const approved = await res.json();
+  if(!allowed){
+    showToast("Supplier not approved yet","error");
+    return;
+  }
 
-const allowed = approved.some(s => s.supplier._id === supplier);
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-if(!allowed){
+  // Enforce single supplier per cart
+  if(cart.length > 0 && cart[0].supplierId !== supplierId){
+    const ok = confirm("Your cart already contains items from a different supplier. Clear cart and add this item?");
+    if(!ok) return;
+    cart = [];
+  }
 
-showToast("Supplier not approved yet","error");
-return;
+  cart.push({
+    productId,
+    supplierId,
+    name,
+    price: Number(price),
+    gst: Number(gst),
+    stock: Number(stock),
+    quantity: 1
+  });
 
-}
+  localStorage.setItem("cart",JSON.stringify(cart));
 
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-cart.push({
-supplier,
-name,
-price,
-gst
-});
-
-localStorage.setItem("cart",JSON.stringify(cart));
-
-window.location.href="page2-cart.html";
-
+  window.location.href="page2-cart.html";
 }
 
 

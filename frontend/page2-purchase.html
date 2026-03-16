@@ -16,6 +16,7 @@
                 <li><a href="page2-dashboard.html" class="nav-link">Dashboard</a></li>
                 <li><a href="page2-suppliers.html" class="nav-link">Suppliers</a></li>
                 <li><a href="page2-purchase.html" class="nav-link active">Purchase Invoice</a></li>
+                <li><a href="page2-cart.html" class="nav-link">Cart</a></li>
                 <li><a href="page2-invoices.html" class="nav-link">Previous Invoices</a></li>
                 <li><a href="index.html" class="nav-link" onclick="logout(event)">Logout</a></li>
             </ul>
@@ -45,7 +46,7 @@
 
                     <div class="form-group">
                         <label for="supplierSelect">Select Supplier</label>
-                        <select id="supplierSelect" onchange="loadSupplierProducts()" required>
+                        <select id="supplierSelect" onchange="Purchase.loadSupplierProducts(this.value)" required>
                             <option value="">Choose a supplier</option>
                         </select>
                     </div>
@@ -87,6 +88,7 @@
         </div>
     </main>
 
+    <script src="js/auth.js"></script>
     <script src="js/navbar.js"></script>
     <script src="js/page2-purchase.js"></script>
 </body>

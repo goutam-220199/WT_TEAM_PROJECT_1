@@ -325,10 +325,27 @@ body {
     padding-bottom: 20px;
 }
 
+.header-content {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
 .page-header h2 {
     font-size: 28px;
     color: var(--primary-color);
     margin: 0;
+}
+
+.user-info {
+    font-size: 14px;
+    color: var(--dark-gray);
+    font-weight: 500;
+}
+
+.user-info #userRole {
+    color: var(--primary-color);
+    font-weight: 600;
 }
 
 .user-greeting {
@@ -1038,6 +1055,43 @@ body {
         width: 100%;
     }
 
+/* Toast notifications */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 12px 18px;
+    border-radius: 6px;
+    color: white;
+    font-weight: 600;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 9999;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.toast.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast-info {
+    background: #333;
+}
+
+.toast-success {
+    background: var(--success-color);
+}
+
+.toast-error {
+    background: var(--danger-color);
+}
+
+.toast-warning {
+    background: var(--warning-color);
+}
+
     .modal-content {
         width: 95%;
         max-width: none;
@@ -1122,6 +1176,32 @@ body {
 
 .hidden {
     display: none;
+}
+
+/* Status Tags */
+.status-tag {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-tag.status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-tag.status-approved {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-tag.status-rejected {
+    background-color: #f8d7da;
+    color: #721c24;
 }
 
 .auth-page{

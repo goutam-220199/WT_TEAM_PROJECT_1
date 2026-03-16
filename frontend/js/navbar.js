@@ -10,7 +10,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update user greeting
     const greeting = document.getElementById('userGreeting');
     if (greeting) {
-        greeting.textContent = `Welcome, ${user.name}! (${capitalizeRole(user.role)})`;
+        const name = localStorage.getItem('name') || 'User';
+        const role = localStorage.getItem('role') || '';
+        greeting.textContent = `Welcome, ${name}! (${role.charAt(0).toUpperCase() + role.slice(1)})`;
     }
 
     // Initialize navbar
@@ -126,3 +128,22 @@ document.addEventListener('keydown', function(event) {
         });
     }
 });
+
+// Simple toast helper
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.add('visible');
+    }, 50);
+
+    setTimeout(() => {
+        toast.classList.remove('visible');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
