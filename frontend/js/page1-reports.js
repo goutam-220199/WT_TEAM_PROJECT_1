@@ -1,201 +1,208 @@
 // Page 1 Reports
 
 const Reports = {
+    last: {
+        daily: null,
+        monthly: null,
+        topProducts: null,
+        comparison: null
+    },
 
-async fetchData(endpoint){
+    async fetchData(endpoint){
+        const token = localStorage.getItem("token");
 
-const token = localStorage.getItem("token");
+        const res = await fetch(`http://localhost:5000/api/reports/${endpoint}`,{
+            headers:{
+                "Authorization":"Bearer "+token
+            }
+        });
 
-const res = await fetch(`http://localhost:5000/api/reports/${endpoint}`,{
-headers:{
-"Authorization":"Bearer "+token
-}
-});
+        return await res.json();
+    },
 
-return await res.json();
+    // -------- DAILY SALES --------
+    async loadDailySalesReport(){
+        const tbody = document.getElementById('dailySalesBody');
+        const data = await this.fetchData("daily");
+        this.last.daily = data;
 
-},
+        if(!data || data.count === 0){
+            tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No data available</td></tr>';
+            return;
+        }
 
-// -------- DAILY SALES --------
+        tbody.innerHTML = `
+            <tr>
+                <td>${new Date().toLocaleDateString()}</td>
+                <td>All Products</td>
+                <td>${data.count}</td>
+                <td>₹${data.totalSales}</td>
+            </tr>
+        `;
+    },
 
-async loadDailySalesReport(){
+    // -------- MONTHLY SALES --------
+    async loadMonthlySalesReport(){
+        const tbody = document.getElementById('monthlySalesBody');
+        const data = await this.fetchData("monthly");
+        this.last.monthly = data;
 
-const tbody = document.getElementById('dailySalesBody');
+        if(!data || data.length === 0){
+            tbody.innerHTML = '<tr><td colspan="3" class="empty-state">No data available</td></tr>';
+            return;
+        }
 
-const data = await this.fetchData("daily");
+        tbody.innerHTML = data.map(row=>`
+            <tr>
+                <td>${row._id.month}/${row._id.year}</td>
+                <td>₹${row.totalSales}</td>
+                <td>${row.orderCount || 0}</td>
+            </tr>
+        `).join("");
+    },
 
-if(!data || data.count === 0){
-tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No data available</td></tr>';
-return;
-}
+    // -------- TOP PRODUCTS --------
+    async loadTopProductsReport(){
+        const tbody = document.getElementById('topProductsBody');
+        const data = await this.fetchData("top-products");
+        this.last.topProducts = data;
 
-tbody.innerHTML = `
-<tr>
-<td>${new Date().toLocaleDateString()}</td>
-<td>All Products</td>
-<td>${data.count}</td>
-<td>₹${data.totalSales}</td>
-</tr>
-`;
+        if(!data || data.length === 0){
+            tbody.innerHTML = '<tr><td colspan="3" class="empty-state">No data available</td></tr>';
+            return;
+        }
 
-},
+        tbody.innerHTML = data.map(product=>`
+            <tr>
+                <td>${product.productName || product._id}</td>
+                <td>${product.totalSold}</td>
+                <td>₹${product.totalRevenue}</td>
+            </tr>
+        `).join("");
+    },
 
+    // -------- SALES COMPARISON GRAPH --------
+    async loadComparisonChart(){
+        const container = document.getElementById('comparisonChart');
+        const data = await this.fetchData("sales-comparison");
+        this.last.comparison = data;
 
-// -------- MONTHLY SALES --------
+        if(!data || data.length === 0){
+            container.innerHTML = '<p class="empty-state">No data for comparison</p>';
+            return;
+        }
 
-async loadMonthlySalesReport(){
+        const ctx = document.getElementById("salesChart");
+        if (!ctx) {
+            container.innerHTML = '<p class="empty-state">Chart container not found</p>';
+            return;
+        }
 
-const tbody = document.getElementById('monthlySalesBody');
+        const labels = data.map(d => d.productName || `Product ${d.productId}`);
+        const values = data.map(d => d.totalSales);
 
-const data = await this.fetchData("monthly");
+        const colors = labels.map((_, i) => {
+            const hue = (i * 40) % 360;
+            return `hsl(${hue}, 70%, 45%)`;
+        });
 
-if(data.length === 0){
-tbody.innerHTML = '<tr><td colspan="3" class="empty-state">No data available</td></tr>';
-return;
-}
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Sales',
+                    data: values,
+                    backgroundColor: colors
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    },
 
-tbody.innerHTML = data.map(row=>`
+    async downloadReport(){
+        // Build CSV for download
+        const rows = [];
+        rows.push(["Daily Sales"]);
+        if (this.last.daily) {
+            rows.push(["Date", "Products", "Count", "Amount"]);
+            rows.push([new Date().toLocaleDateString(), "All Products", this.last.daily.count, this.last.daily.totalSales]);
+            rows.push([""]);
+        }
 
-<tr>
+        if (this.last.monthly) {
+            rows.push(["Monthly Sales"]);
+            rows.push(["Month", "Total Sales", "Orders"]);
+            this.last.monthly.forEach(r => {
+                rows.push([`${r._id.month}/${r._id.year}`, r.totalSales, r.orderCount || 0]);
+            });
+            rows.push([""]);
+        }
 
-<td>${row._id.month}/${row._id.year}</td>
+        if (this.last.topProducts) {
+            rows.push(["Top Products"]);
+            rows.push(["Product", "Units Sold", "Revenue"]);
+            this.last.topProducts.forEach(p => {
+                rows.push([p.productName || p._id, p.totalSold, p.totalRevenue]);
+            });
+            rows.push([""]);
+        }
 
-<td>₹${row.totalSales}</td>
+        if (this.last.comparison) {
+            rows.push(["Sales Comparison"]);
+            rows.push(["Product", "Sales"]);
+            this.last.comparison.forEach(c => {
+                rows.push([c.productName || c.productId, c.totalSales]);
+            });
+            rows.push([""]);
+        }
 
-<td>-</td>
-
-</tr>
-
-`).join("");
-
-},
-
-
-// -------- TOP PRODUCTS --------
-
-async loadTopProductsReport(){
-
-const tbody = document.getElementById('topProductsBody');
-
-const data = await this.fetchData("top-products");
-
-if(data.length === 0){
-tbody.innerHTML = '<tr><td colspan="3" class="empty-state">No data available</td></tr>';
-return;
-}
-
-tbody.innerHTML = data.map(product=>`
-
-<tr>
-
-<td>${product._id}</td>
-
-<td>${product.totalSold}</td>
-
-<td>₹${product.totalRevenue}</td>
-
-</tr>
-
-`).join("");
-
-},
-
-
-// -------- SALES COMPARISON GRAPH --------
-
-async loadComparisonChart(){
-
-const container = document.getElementById('comparisonChart');
-
-const data = await this.fetchData("sales-comparison");
-
-if(data.length === 0){
-container.innerHTML = '<p class="empty-state">No data for comparison</p>';
-return;
-}
-
-const max = Math.max(...data.map(d=>d.totalSales));
-
-let html = '<table class="data-table" style="width:100%"><thead><tr><th>Month</th><th>Sales</th></tr></thead><tbody>';
-
-data.forEach(d=>{
-
-const width = (d.totalSales / max) * 100;
-
-html += `
-<tr>
-
-<td>Month ${d._id}</td>
-
-<td>
-<div style="background:#eee;border-radius:4px;overflow:hidden">
-<div style="background:black;width:${width}%;height:20px;color:white;padding-left:5px;font-size:11px">
-₹${d.totalSales}
-</div>
-</div>
-</td>
-
-</tr>
-`;
-
-});
-
-html += '</tbody></table>';
-
-container.innerHTML = html;
-
-}
-
+        const csvContent = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n");
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `sales-report-${new Date().toISOString().slice(0,10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
 };
 
 
 // -------- GENERATE REPORT --------
 
-function generateReport(){
-
-Reports.loadDailySalesReport();
-Reports.loadMonthlySalesReport();
-Reports.loadTopProductsReport();
-Reports.loadComparisonChart();
-
-showToast("Report generated successfully","success");
-
-}
+window.generateReport = async function() {
+    await Reports.loadDailySalesReport();
+    await Reports.loadMonthlySalesReport();
+    await Reports.loadTopProductsReport();
+    await Reports.loadComparisonChart();
+    await Reports.downloadReport();
+    showToast("Report generated successfully","success");
+};
 
 
 // -------- PAGE INIT --------
-
 document.addEventListener("DOMContentLoaded",function(){
-
-generateReport();
-
-});
-async function loadSalesGraph(){
-
-const token = localStorage.getItem("token");
-
-const data = await fetch(
-"http://localhost:5000/api/reports/sales-comparison",
-{headers:{Authorization:"Bearer "+token}}
-).then(r=>r.json());
-
-const labels = data.map(d=>"Month "+d._id);
-const values = data.map(d=>d.totalSales);
-
-new Chart(document.getElementById("salesChart"),{
-
-type:"line",
-
-data:{
-labels:labels,
-datasets:[{
-label:"Sales",
-data:values,
-borderColor:"black",
-fill:false
-}]
-}
-
+    // Only load reports, do not download
+    Reports.loadDailySalesReport();
+    Reports.loadMonthlySalesReport();
+    Reports.loadTopProductsReport();
+    Reports.loadComparisonChart();
 });
 
+// Add event listener for Generate Report button
+const generateBtn = document.getElementById('generateReportBtn');
+if (generateBtn) {
+    generateBtn.addEventListener('click', async function() {
+        await Reports.loadDailySalesReport();
+        await Reports.loadMonthlySalesReport();
+        await Reports.loadTopProductsReport();
+        await Reports.loadComparisonChart();
+        await Reports.downloadReport();
+        showToast("Report generated successfully","success");
+    });
 }

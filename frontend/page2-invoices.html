@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Previous Invoices - InventoryPro</title>
+    <title>Previous Orders - InventoryPro</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -16,7 +16,8 @@
                 <li><a href="page2-dashboard.html" class="nav-link">Dashboard</a></li>
                 <li><a href="page2-suppliers.html" class="nav-link">Suppliers</a></li>
                 <li><a href="page2-purchase.html" class="nav-link">Purchase Invoice</a></li>
-                <li><a href="page2-invoices.html" class="nav-link active">Previous Invoices</a></li>
+                <li><a href="page2-cart.html" class="nav-link">Cart</a></li>
+                <li><a href="page2-invoices.html" class="nav-link active">Previous Orders</a></li>
                 <li><a href="index.html" class="nav-link" onclick="logout(event)">Logout</a></li>
             </ul>
             <div class="hamburger" id="hamburger">
@@ -30,13 +31,13 @@
     <main class="main-content">
         <div class="invoices-container">
             <div class="page-header">
-                <h2>Previous Purchase Invoices</h2>
+                <h2>Previous Purchase Orders</h2>
             </div>
 
             <div class="invoices-filters">
-                <input type="text" id="searchInvoice" placeholder="Search by invoice ID or supplier name..." onkeyup="searchInvoices()">
+                <input type="text" id="searchInvoice" placeholder="Search by order ID or supplier name..." onkeyup="searchInvoices()">
                 <select id="invoiceFilter" onchange="filterInvoices()">
-                    <option value="">All Invoices</option>
+                    <option value="">All Orders</option>
                     <option value="">Sort by Date (Newest)</option>
                     <option value="">Sort by Amount (High to Low)</option>
                 </select>
@@ -46,12 +47,12 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Invoice ID</th>
+                            <th>Order ID</th>
                             <th>Supplier</th>
                             <th>Date</th>
-                            <th>Total Products</th>
+                            <th>Items</th>
                             <th>Total Amount</th>
-                            <th>Actions</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody id="invoicesBody">
@@ -68,7 +69,7 @@
     <div id="invoiceDetailsModal" class="modal">
         <div class="modal-content modal-large">
             <span class="close" onclick="closeInvoiceDetails()">&times;</span>
-            <h2>Invoice Details</h2>
+            <h2>Order Details</h2>
             
             <div id="invoiceDetailsContent" class="invoice-details">
                 <!-- Populated dynamically -->
@@ -76,12 +77,13 @@
 
             <div class="modal-actions">
                 <button class="btn btn-secondary" onclick="printInvoice()">Print</button>
-                <button class="btn btn-secondary" onclick="downloadInvoice()">Download PDF</button>
+                <button class="btn btn-secondary" onclick="downloadInvoice()">Download</button>
                 <button class="btn btn-secondary" onclick="closeInvoiceDetails()">Close</button>
             </div>
         </div>
     </div>
 
+    <script src="js/auth.js"></script>
     <script src="js/navbar.js"></script>
     <script src="js/page2-invoices.js"></script>
 </body>

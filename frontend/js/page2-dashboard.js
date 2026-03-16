@@ -1,20 +1,29 @@
 // Page 2 Dashboard (Retailer, Small Scale Business Owner)
+
 const Dashboard2 = {
-    data: JSON.parse(localStorage.getItem('page2Data')) || {
-        suppliers: [],
-        purchases: [],
-        invoices: []
-    },
+    suppliers: [],
+    invoices: [],
 
-    saveData() {
-        localStorage.setItem('page2Data', JSON.stringify(this.data));
-    },
+    async loadDashboardStats() {
+        const token = localStorage.getItem('token');
 
-    loadDashboardStats() {
-        const totalSuppliers = this.data.suppliers.length;
-        const totalProductsPurchased = this.data.purchases.reduce((sum, p) => sum + p.quantity, 0);
-        const totalSpending = this.data.invoices.reduce((sum, inv) => sum + inv.total, 0);
-        const totalInvoices = this.data.invoices.length;
+        // Approved suppliers
+        const supRes = await fetch('http://localhost:5000/api/supplier-request/approved', {
+            headers: { Authorization: 'Bearer ' + token }
+        });
+        const approvedSuppliers = await supRes.json();
+        this.suppliers = approvedSuppliers;
+
+        // Invoices
+        const invRes = await fetch('http://localhost:5000/api/invoices/my-invoices', {
+            headers: { Authorization: 'Bearer ' + token }
+        });
+        this.invoices = await invRes.json();
+
+        const totalSuppliers = this.suppliers.length;
+        const totalInvoices = this.invoices.length;
+        const totalSpending = this.invoices.reduce((sum, inv) => sum + (inv.total || 0), 0);
+        const totalProductsPurchased = this.invoices.reduce((sum, inv) => sum + (inv.quantity || 0), 0);
 
         document.getElementById('totalSuppliers').textContent = totalSuppliers;
         document.getElementById('totalProductsPurchased').textContent = totalProductsPurchased;
@@ -23,14 +32,14 @@ const Dashboard2 = {
 
         // Quick stats
         document.getElementById('activeSuppliers').textContent = totalSuppliers;
-        
+
         // Monthly spending
         const currentMonth = new Date().getMonth();
-        const monthlyInvoices = this.data.invoices.filter(inv => {
-            const invMonth = new Date(inv.date).getMonth();
+        const monthlyInvoices = this.invoices.filter(inv => {
+            const invMonth = new Date(inv.createdAt).getMonth();
             return invMonth === currentMonth;
         });
-        const monthlySpending = monthlyInvoices.reduce((sum, inv) => sum + inv.total, 0);
+        const monthlySpending = monthlyInvoices.reduce((sum, inv) => sum + (inv.total || 0), 0);
         document.getElementById('monthlySpending').textContent = '₹' + monthlySpending.toLocaleString();
 
         // Average order value
@@ -42,7 +51,7 @@ const Dashboard2 = {
 
     loadRecentPurchases() {
         const tbody = document.getElementById('recentPurchasesBody');
-        const recentPurchases = this.data.invoices.slice(-5).reverse();
+        const recentPurchases = this.invoices.slice(-5).reverse();
 
         if (recentPurchases.length === 0) {
             tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No purchases yet</td></tr>';
@@ -50,16 +59,15 @@ const Dashboard2 = {
         }
 
         tbody.innerHTML = recentPurchases.map(invoice => {
-            const products = invoice.items.map(i => i.name).join(', ');
-            const totalQty = invoice.items.reduce((sum, i) => sum + i.quantity, 0);
-            
+            const productName = invoice.product?.name || '';
+
             return `
                 <tr>
-                    <td>${products}</td>
-                    <td>${invoice.supplierName}</td>
-                    <td>${totalQty}</td>
-                    <td>${new Date(invoice.date).toLocaleDateString()}</td>
-                    <td>₹${invoice.total.toFixed(2)}</td>
+                    <td>${productName}</td>
+                    <td>${invoice.supplier || ''}</td>
+                    <td>${invoice.quantity || 0}</td>
+                    <td>${new Date(invoice.createdAt).toLocaleDateString()}</td>
+                    <td>₹${(invoice.total || 0).toFixed(2)}</td>
                 </tr>
             `;
         }).join('');

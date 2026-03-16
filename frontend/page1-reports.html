@@ -51,7 +51,7 @@
                     <option value="11">November</option>
                     <option value="12">December</option>
                 </select>
-                <button class="btn btn-secondary" onclick="generateReport()">Generate Report</button>
+                <button class="btn btn-secondary" id="generateReportBtn">Generate Report</button>
             </div>
 
             <div class="reports-section">
@@ -112,14 +112,15 @@
 
                 <div class="report-card">
                     <h3>Sales Comparison</h3>
-                    <div id="comparisonChart" class="chart-container">
-                        <p class="empty-state">No data for comparison</p>
+                    <div class="chart-container">
+                        <canvas id="salesChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/navbar.js"></script>
     <script src="js/page1-reports.js"></script>
 </body>

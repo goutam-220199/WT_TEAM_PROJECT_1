@@ -104,9 +104,10 @@ const Auth = {
                 return false;
             }
 
-            // store token and role
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("role", data.role);
+// store token and user info
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("role", data.role);
+    localStorage.setItem("name", data.name || "");
 
             return true;
 
@@ -119,10 +120,18 @@ const Auth = {
     logout() {
         localStorage.removeItem("token");
         localStorage.removeItem("role");
+        localStorage.removeItem("name");
     },
 
     getToken() {
         return localStorage.getItem("token");
+    },
+
+    getCurrentUser() {
+        const name = localStorage.getItem("name");
+        const role = localStorage.getItem("role");
+        if (!name && !role) return null;
+        return { name, role };
     },
 
     isAuthenticated() {
@@ -199,3 +208,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 });
+
+// Global logout function for onclick handlers
+function logout(event) {
+    if (event) event.preventDefault();
+    Auth.logout();
+    window.location.href = "index.html";
+}

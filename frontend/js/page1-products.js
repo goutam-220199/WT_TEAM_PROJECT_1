@@ -26,7 +26,7 @@ const Products = {
         }
 
         grid.innerHTML = products.map(product => `
-            <div class="product-card ${product.quantity < 10 ? 'low-stock' : ''}">
+            <div class="product-card ${product.stock < 10 ? 'low-stock' : ''}">
                 <div class="product-header">
                     <div class="product-name">${product.name}</div>
                     <div class="product-details">
@@ -36,8 +36,8 @@ const Products = {
                 </div>
 
                 <div class="product-details" style="margin-bottom: 15px;">
-                    <span>Stock: ${product.quantity} units</span>
-                    <span>${product.quantity < 10 ? '⚠️ Low Stock' : '✓ In Stock'}</span>
+                    <span>Stock: ${product.stock} units</span>
+                    <span>${product.stock < 10 ? '⚠️ Low Stock' : '✓ In Stock'}</span>
                 </div>
 
                 ${product.description ? `<p style="font-size: 13px; color: #666; margin-bottom: 15px;">${product.description}</p>` : ''}
@@ -78,7 +78,7 @@ const Products = {
         const data = await res.json();
 
         if (!res.ok) {
-            showToast("Failed to add product", "error");
+            showToast(data.message || "Failed to add product", "error");
             return false;
         }
 
@@ -182,7 +182,7 @@ function editProduct(productId) {
     document.getElementById('productName').value = product.name;
     document.getElementById('productPrice').value = product.price;
     document.getElementById('productGST').value = product.gst;
-    document.getElementById('productQuantity').value = product.quantity;
+    document.getElementById('productQuantity').value = product.stock;
     document.getElementById('productDescription').value = product.description || '';
 
     openModal('productModal');
@@ -238,6 +238,37 @@ document.addEventListener('DOMContentLoaded', function () {
 
         });
 
+    }
+
+    // Display current user info
+    const userName = localStorage.getItem('name') || 'User';
+    const userRole = localStorage.getItem('role') || 'Unknown';
+    
+    const userNameElement = document.getElementById('userName');
+    const userRoleElement = document.getElementById('userRole');
+    
+    if (userNameElement) userNameElement.textContent = userName;
+    if (userRoleElement) userRoleElement.textContent = userRole;
+
+    // Show role-based restrictions for retailers
+    if (userRole === 'retailer') {
+        // Hide Add Product button for retailers
+        const addProductBtn = document.querySelector('.page-header .btn-primary');
+        if (addProductBtn) {
+            addProductBtn.style.display = 'none';
+        }
+        
+        // Add a message explaining the restriction
+        const headerContent = document.querySelector('.header-content');
+        if (headerContent) {
+            const message = document.createElement('p');
+            message.textContent = 'Retailers cannot add products. Only wholesalers, distributors, and manufacturers can add products.';
+            message.style.color = '#e74c3c';
+            message.style.fontSize = '14px';
+            message.style.margin = '5px 0 0 0';
+            message.style.fontWeight = '500';
+            headerContent.appendChild(message);
+        }
     }
 
     Products.loadProducts();

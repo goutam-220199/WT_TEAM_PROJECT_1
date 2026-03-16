@@ -1,84 +1,88 @@
 // Page 1 Orders Management
+
 const Orders = {
-    data: JSON.parse(localStorage.getItem('page1Data')) || {
-        products: [],
-        orders: [],
-        sales: [],
-        invoices: []
+    orders: [],
+
+    async loadOrders() {
+        const token = localStorage.getItem('token');
+        const res = await fetch('http://localhost:5000/api/orders/supplier', {
+            headers: { Authorization: 'Bearer ' + token }
+        });
+
+        this.orders = await res.json();
+        this.renderOrders();
     },
 
-    saveData() {
-        localStorage.setItem('page1Data', JSON.stringify(this.data));
+    renderOrders() {
+        const pendingGrid = document.getElementById('pendingOrdersGrid');
+        const approvedGrid = document.getElementById('approvedOrdersGrid');
+        const rejectedGrid = document.getElementById('rejectedOrdersGrid');
+
+        const pending = this.orders.filter(o => o.status === 'pending');
+        const approved = this.orders.filter(o => o.status === 'approved');
+        const rejected = this.orders.filter(o => o.status === 'rejected');
+
+        pendingGrid.innerHTML = pending.length === 0
+            ? '<p class="empty-state">No pending orders</p>'
+            : pending.map(order => this.renderOrderCard(order)).join('');
+
+        approvedGrid.innerHTML = approved.length === 0
+            ? '<p class="empty-state">No approved orders</p>'
+            : approved.map(order => this.renderOrderCard(order)).join('');
+
+        rejectedGrid.innerHTML = rejected.length === 0
+            ? '<p class="empty-state">No rejected orders</p>'
+            : rejected.map(order => this.renderOrderCard(order)).join('');
     },
 
-    loadOrders(filter = '') {
-        const grid = document.getElementById('ordersGrid');
-        
-        let orders = this.data.orders;
-        if (filter) {
-            orders = orders.filter(o => o.status === filter);
-        }
+    renderOrderCard(order) {
+        const total = order.items.reduce((sum, item) => sum + (item.total || 0), 0);
+        const products = order.items.map(i => `${i.name} (x${i.quantity})`).join(', ');
 
-        if (orders.length === 0) {
-            grid.innerHTML = '<p class="empty-state">No orders yet</p>';
-            return;
-        }
-
-        grid.innerHTML = orders.map(order => `
+        return `
             <div class="order-card">
                 <div class="order-header">
-                    <div class="order-id">Order #${order.id.slice(-6).toUpperCase()}</div>
+                    <div class="order-id">Order #${order._id.slice(-6).toUpperCase()}</div>
                     <div class="order-status ${order.status}">${order.status.charAt(0).toUpperCase() + order.status.slice(1)}</div>
                 </div>
                 <div class="order-info">
-                    <strong>Buyer:</strong> ${order.buyerName}<br>
-                    <strong>Email:</strong> ${order.buyerEmail}<br>
-                    <strong>Date:</strong> ${new Date(order.date).toLocaleDateString()}<br>
-                    <strong>Products:</strong> ${order.items.length} item(s)<br>
-                    <strong>Total Amount:</strong> ₹${order.total}
+                    <strong>Retailer:</strong> ${order.retailer?.name || 'N/A'}<br>
+                    <strong>Date:</strong> ${new Date(order.createdAt).toLocaleDateString()}<br>
+                    <strong>Products:</strong> ${products}<br>
+                    <strong>Total Amount:</strong> ₹${total.toFixed(2)}
                 </div>
                 <div class="order-actions">
                     ${order.status === 'pending' ? `
-                        <button class="btn btn-success" onclick="approveOrder('${order.id}')">Approve</button>
-                        <button class="btn btn-danger" onclick="rejectOrder('${order.id}')">Reject</button>
+                        <button class="btn btn-success" onclick="approveOrder('${order._id}')">Approve</button>
+                        <button class="btn btn-danger" onclick="rejectOrder('${order._id}')">Reject</button>
                     ` : `
-                        <button class="btn btn-secondary" disabled>Already ${order.status}</button>
+                        <button class="btn btn-secondary" disabled>${order.status.charAt(0).toUpperCase() + order.status.slice(1)}</button>
                     `}
                 </div>
             </div>
-        `).join('');
+        `;
     },
 
-    approveOrder(orderId) {
-        const order = this.data.orders.find(o => o.id === orderId);
-        if (!order) return;
-
-        order.status = 'approved';
-        order.statusUpdatedAt = new Date().toISOString();
-        this.saveData();
-        
-        this.loadOrders(document.getElementById('statusFilter').value);
+    async approveOrder(orderId) {
+        const token = localStorage.getItem('token');
+        await fetch(`http://localhost:5000/api/orders/approve/${orderId}`, {
+            method: 'PUT',
+            headers: { Authorization: 'Bearer ' + token }
+        });
         showToast('Order approved successfully!', 'success');
+        await this.loadOrders();
     },
 
-    rejectOrder(orderId) {
-        const order = this.data.orders.find(o => o.id === orderId);
-        if (!order) return;
-
-        order.status = 'rejected';
-        order.statusUpdatedAt = new Date().toISOString();
-        this.saveData();
-        
-        this.loadOrders(document.getElementById('statusFilter').value);
+    async rejectOrder(orderId) {
+        const token = localStorage.getItem('token');
+        await fetch(`http://localhost:5000/api/orders/reject/${orderId}`, {
+            method: 'PUT',
+            headers: { Authorization: 'Bearer ' + token }
+        });
         showToast('Order rejected!', 'success');
+        await this.loadOrders();
     }
 };
-
-// Filter orders
-function filterOrders() {
-    const filter = document.getElementById('statusFilter').value;
-    Orders.loadOrders(filter);
-}
 
 function approveOrder(orderId) {
     Orders.approveOrder(orderId);
