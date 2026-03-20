@@ -1,152 +1,944 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>InventoryPro - Login</title>
-<link rel="stylesheet" href="css/styles.css">
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <title>InventoryPro - Landing Page</title>
+
+ <style>
+ /* Reset and Base Styles */
+ * {
+ margin: 0;
+ padding: 0;
+ box-sizing: border-box;
+ }
+
+ :root {
+ --primary-color: #000;
+ --secondary-color: #fff;
+ --border-color: #e0e0e0;
+ --text-color: #333;
+ --success-color: #27ae60;
+ --danger-color: #e74c3c;
+ --warning-color: #f39c12;
+ --light-gray: #f5f5f5;
+ --dark-gray: #666;
+ --section-soft: #fafafa;
+ --section-soft-2: #f8f8f8;
+ --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+ }
+
+ html {
+ scroll-behavior: smooth;
+ }
+
+ body {
+ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+ background-color: var(--light-gray);
+ color: var(--text-color);
+ line-height: 1.6;
+ }
+
+ /* Navbar */
+ .navbar {
+ background-color: #fafafa;
+ border-bottom: 1px solid var(--border-color);
+ position: sticky;
+ top: 0;
+ z-index: 1000;
+ box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+ }
+
+ .navbar-container {
+ max-width: 1400px;
+ margin: 0 auto;
+ padding: 0 20px;
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ height: 70px;
+ gap: 20px;
+ }
+
+ .navbar-logo {
+ flex-shrink: 0;
+ }
+
+ .logo {
+ font-size: 28px;
+ font-weight: 700;
+ color: var(--primary-color);
+ margin: 0;
+ letter-spacing: -0.5px;
+ }
+
+ .header-auth-actions {
+ display: flex;
+ gap: 12px;
+ align-items: center;
+ }
+
+ /* Buttons */
+ .btn {
+ padding: 12px 24px;
+ border: none;
+ border-radius: 8px;
+ font-size: 13px;
+ font-weight: 600;
+ cursor: pointer;
+ transition: var(--transition);
+ text-transform: uppercase;
+ letter-spacing: 0.5px;
+ display: inline-block;
+ text-decoration: none;
+ text-align: center;
+ }
+
+ .btn-primary {
+ background-color: var(--primary-color);
+ color: var(--secondary-color);
+ }
+
+ .btn-primary:hover {
+ background-color: var(--text-color);
+ transform: translateY(-2px);
+ box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+ }
+
+ .btn-secondary {
+ background-color: var(--secondary-color);
+ color: var(--primary-color);
+ border: 1px solid var(--border-color);
+ }
+
+ .btn-secondary:hover {
+ background-color: #f0f0f0;
+ transform: translateY(-2px);
+ }
+
+ .header-auth-actions .btn {
+ width: auto;
+ margin: 0;
+ min-width: 110px;
+ }
+
+ /* Main */
+ .main-content {
+ max-width: 1400px;
+ margin: 0 auto;
+ padding: 0 20px;
+ }
+
+ /* Hero */
+ .landing-main {
+ min-height: calc(100vh - 140px);
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ text-align: center;
+ padding-top: 60px;
+ padding-bottom: 60px;
+ }
+
+ .hero-section {
+ max-width: 1000px;
+ margin: 0 auto;
+ }
+
+ .hero-section h2 {
+ font-size: 36px;
+ margin-bottom: 18px;
+ color: var(--primary-color);
+ position: relative;
+ display: inline-block;
+ padding-bottom: 12px;
+ }
+
+ .hero-section h2::after {
+ content: "";
+ position: absolute;
+ left: 50%;
+ transform: translateX(-50%);
+ bottom: 0;
+ width: 220px;
+ height: 3px;
+ background: var(--primary-color);
+ }
+
+ .hero-section p.main-text {
+ max-width: 760px;
+ margin: 20px auto 0;
+ color: var(--dark-gray);
+ font-size: 16px;
+ line-height: 1.8;
+ }
+
+ /* Generic section */
+ .content-section {
+ padding: 70px 0;
+ }
+
+ .section-header {
+ text-align: center;
+ max-width: 850px;
+ margin: 0 auto 40px;
+ }
+
+ .section-header h2 {
+ font-size: 30px;
+ color: var(--primary-color);
+ margin-bottom: 12px;
+ position: relative;
+ display: inline-block;
+ padding-bottom: 10px;
+ }
+
+ .section-header h2::after {
+ content: "";
+ position: absolute;
+ left: 50%;
+ transform: translateX(-50%);
+ bottom: 0;
+ width: 150px;
+ height: 3px;
+ background: var(--primary-color);
+ }
+
+ .section-header p {
+ color: var(--dark-gray);
+ font-size: 15px;
+ margin-top: 16px;
+ line-height: 1.8;
+ }
+
+ /* Top cards */
+ .feature-box-container {
+ display: flex;
+ justify-content: center;
+ align-items: stretch;
+ flex-wrap: wrap;
+ gap: 24px;
+ margin-top: 45px;
+ }
+
+ .feature-box {
+ background: #ffffff;
+ width: 280px;
+ min-height: 150px;
+ padding: 24px 20px;
+ border-radius: 12px;
+ text-align: center;
+ display: flex;
+ flex-direction: column;
+ justify-content: center;
+ box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+ transition: var(--transition);
+ border: 1px solid #e5e5e5;
+ }
+
+ .feature-box:hover {
+ transform: translateY(-6px);
+ box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+ }
+
+ .feature-box h3 {
+ font-size: 17px;
+ margin-bottom: 10px;
+ color: #111;
+ }
+
+ .feature-box p {
+ font-size: 14px;
+ color: #333;
+ line-height: 1.5;
+ margin: 0;
+ }
+
+ /* Feature roles section */
+ .roles-features-section {
+ background: var(--section-soft);
+ border-top: 1px solid var(--border-color);
+ border-bottom: 1px solid var(--border-color);
+ }
+
+ .roles-grid {
+ display: grid;
+ grid-template-columns: repeat(2, minmax(320px, 1fr));
+ gap: 28px;
+ margin-top: 10px;
+ }
+
+ .role-panel {
+ background: linear-gradient(to bottom, #ffffff, #fbfbfb);
+ border: 1px solid var(--border-color);
+ border-radius: 18px;
+ padding: 28px;
+ box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+ transition: var(--transition);
+ }
+
+ .role-panel:hover {
+ transform: translateY(-4px);
+ box-shadow: 0 14px 30px rgba(0, 0, 0, 0.09);
+ }
+
+ .role-panel.supplier-role {
+ background: linear-gradient(to bottom, #ffffff, #f7f7f7);
+ }
+
+ .role-panel.retailer-role {
+ background: linear-gradient(to bottom, #ffffff, #f9f9f9);
+ }
+
+ .role-badge {
+ display: inline-block;
+ padding: 6px 12px;
+ border: 1px solid var(--border-color);
+ border-radius: 999px;
+ font-size: 11px;
+ font-weight: 700;
+ text-transform: uppercase;
+ letter-spacing: 0.7px;
+ background: #fff;
+ color: var(--primary-color);
+ margin-bottom: 16px;
+ }
+
+ .role-panel h3 {
+ font-size: 24px;
+ color: var(--primary-color);
+ margin-bottom: 10px;
+ }
+
+ .role-panel > p {
+ color: var(--dark-gray);
+ font-size: 14px;
+ margin-bottom: 22px;
+ line-height: 1.7;
+ }
+
+ .role-feature-list {
+ display: grid;
+ gap: 14px;
+ }
+
+ .role-feature-card {
+ background: rgba(255, 255, 255, 0.95);
+ border: 1px solid var(--border-color);
+ border-radius: 12px;
+ padding: 16px 16px 14px;
+ transition: var(--transition);
+ }
+
+ .role-feature-card:hover {
+ border-color: var(--primary-color);
+ transform: translateX(4px);
+ }
+
+ .role-feature-card h4 {
+ font-size: 15px;
+ color: var(--primary-color);
+ margin-bottom: 6px;
+ }
+
+ .role-feature-card p {
+ font-size: 13px;
+ color: var(--dark-gray);
+ line-height: 1.6;
+ }
+
+ /* CTA strip */
+ .cta-strip {
+ background: var(--section-soft-2);
+ border: 1px solid var(--border-color);
+ border-radius: 18px;
+ padding: 32px 24px;
+ text-align: center;
+ margin: 10px 0 20px;
+ }
+
+ .cta-strip h3 {
+ font-size: 24px;
+ color: var(--primary-color);
+ margin-bottom: 10px;
+ }
+
+ .cta-strip p {
+ color: var(--dark-gray);
+ max-width: 760px;
+ margin: 0 auto 20px;
+ font-size: 15px;
+ }
+
+ .cta-actions {
+ display: flex;
+ justify-content: center;
+ gap: 12px;
+ flex-wrap: wrap;
+ }
+
+ /* Form Styles */
+ .auth-form h2 {
+ font-size: 24px;
+ margin-bottom: 20px;
+ color: var(--primary-color);
+ text-align: left;
+ }
+
+ .form-group {
+ margin-bottom: 20px;
+ text-align: left;
+ }
+
+ .form-group label {
+ display: block;
+ margin-bottom: 6px;
+ font-weight: 600;
+ font-size: 13px;
+ color: var(--text-color);
+ text-transform: uppercase;
+ letter-spacing: 0.5px;
+ }
+
+ .form-group input,
+ .form-group select {
+ width: 100%;
+ padding: 12px 14px;
+ border: 1px solid var(--border-color);
+ border-radius: 8px;
+ font-size: 14px;
+ background-color: var(--secondary-color);
+ color: var(--text-color);
+ transition: var(--transition);
+ }
+
+ .form-group input:focus,
+ .form-group select:focus {
+ outline: none;
+ border-color: var(--primary-color);
+ box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+ }
+
+ .error-msg {
+ display: block;
+ color: var(--danger-color);
+ font-size: 12px;
+ margin-top: 4px;
+ }
+
+ .auth-submit-btn,
+ .auth-google-btn {
+ width: 100%;
+ margin-top: 10px;
+ }
+
+ .auth-google-btn {
+ background-color: #f7f7f7;
+ color: var(--primary-color);
+ border: 1px solid var(--border-color);
+ }
+
+ .auth-google-btn:hover {
+ background-color: #ececec;
+ transform: translateY(-2px);
+ }
+
+ /* Modal */
+ .modal {
+ display: none;
+ position: fixed;
+ z-index: 2000;
+ left: 0;
+ top: 0;
+ width: 100%;
+ height: 100%;
+ background-color: rgba(0, 0, 0, 0.5);
+ animation: fadeIn 0.3s ease-in;
+ }
+
+ .modal.active {
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ }
+
+ .modal-content {
+ background-color: var(--secondary-color);
+ padding: 30px;
+ border-radius: 16px;
+ width: 90%;
+ max-width: 460px;
+ max-height: 90vh;
+ overflow-y: auto;
+ box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+ animation: slideIn 0.3s ease-out;
+ position: relative;
+ }
+
+ .close {
+ color: var(--dark-gray);
+ position: absolute;
+ top: 12px;
+ right: 18px;
+ font-size: 28px;
+ font-weight: bold;
+ cursor: pointer;
+ transition: var(--transition);
+ line-height: 1;
+ }
+
+ .close:hover {
+ color: var(--primary-color);
+ }
+
+ @keyframes fadeIn {
+ from { opacity: 0; }
+ to { opacity: 1; }
+ }
+
+ @keyframes slideIn {
+ from {
+ transform: translateY(-50px);
+ opacity: 0;
+ }
+ to {
+ transform: translateY(0);
+ opacity: 1;
+ }
+ }
+
+ /* Footer */
+ .landing-footer {
+ background-color: #fcfcfc;
+ border-top: 1px solid var(--border-color);
+ padding: 20px;
+ margin-top: 30px;
+ }
+
+ .footer-container {
+ max-width: 1400px;
+ margin: 0 auto;
+ text-align: center;
+ }
+
+ .footer-container p {
+ font-size: 13px;
+ color: var(--dark-gray);
+ margin: 0;
+ }
+
+ /* Responsive */
+ @media (max-width: 992px) {
+ .roles-grid {
+ grid-template-columns: 1fr;
+ }
+ }
+
+ @media (max-width: 768px) {
+ .navbar-container {
+ padding: 0 15px;
+ height: auto;
+ min-height: 60px;
+ flex-wrap: wrap;
+ gap: 10px;
+ padding-top: 12px;
+ padding-bottom: 12px;
+ }
+
+ .logo {
+ font-size: 22px;
+ }
+
+ .main-content {
+ padding: 0 15px;
+ }
+
+ .landing-main {
+ min-height: auto;
+ padding-top: 40px;
+ padding-bottom: 40px;
+ }
+
+ .hero-section h2,
+ .section-header h2 {
+ font-size: 28px;
+ }
+
+ .hero-section p.main-text,
+ .section-header p {
+ font-size: 15px;
+ }
+
+ .header-auth-actions {
+ gap: 8px;
+ }
+
+ .header-auth-actions .btn {
+ min-width: 90px;
+ padding: 10px 14px;
+ }
+
+ .feature-box {
+ width: 100%;
+ max-width: 340px;
+ }
+
+ .modal-content {
+ width: 95%;
+ padding: 20px;
+ }
+
+ .content-section {
+ padding: 50px 0;
+ }
+ }
+
+ @media (max-width: 480px) {
+ .navbar-logo,
+ .header-auth-actions {
+ width: 100%;
+ display: flex;
+ justify-content: center;
+ }
+
+ .hero-section h2,
+ .section-header h2 {
+ font-size: 24px;
+ }
+
+ .hero-section h2::after,
+ .section-header h2::after {
+ width: 140px;
+ }
+
+ .btn {
+ padding: 10px 16px;
+ font-size: 12px;
+ }
+
+ .logo {
+ font-size: 20px;
+ }
+
+ .modal-content {
+ padding: 15px;
+ }
+
+ .auth-form h2 {
+ font-size: 20px;
+ }
+
+ .role-panel {
+ padding: 20px;
+ }
+ }
+ .hero-logo-wrap {
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ margin-bottom: 30px;
+ }
+
+ .site-logo {
+ width: 400px;
+ max-width: 90%;
+ height: 200px;
+ display: block;
+ padding: 10px;
+ border-radius: 50px;
+ transition: var(--transition);
+ }
+
+ .site-logo:hover {
+ transform: translateY(-6px);
+ box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+ }
+ </style>
 </head>
+<body>
 
-<body class="login-body">
+ <!-- HEADER -->
+ <header class="navbar">
+ <div class="navbar-container">
+ <div class="navbar-logo">
+ <h1 class="logo">InventoryPro</h1>
+ </div>
 
-<div class="auth-page">
+ <div class="header-auth-actions">
+ <button id="loginBtn" class="btn btn-secondary" onclick="openModal('loginModal')">Login</button>
+ <button id="registerBtn" class="btn btn-primary" onclick="openModal('registerModal')">Register</button>
+ </div>
+ </div>
+ </header>
+ 
+ <!-- HERO -->
+ <main class="main-content">
+ <section class="landing-main">
+ <div class="hero-section">
+ <div class="hero-logo-wrap">
+ <img src="images/logo.png" alt="B2B Manager Logo" class="site-logo">
+ </div> 
+ <h2>B2B Inventory & Product Management</h2>
 
-   <!-- LEFT SIDE BRAND SECTION -->
-<div class="auth-left">
+ <p class="main-text">
+ Powerful inventory tracking, supplier management and billing system built for modern businesses.
+ </p>
 
-    <h1 class="logo">InventoryPro</h1>
+ <div class="feature-box-container">
+ <div class="feature-box">
+ <h3>Smart Inventory Tracking</h3>
+ <p>Monitor stock levels in real time and prevent shortages or overstocking.</p>
+ </div>
 
-    <h2>B2B Inventory & Product Management</h2>
+ <div class="feature-box">
+ <h3>Supplier Management</h3>
+ <p>Keep supplier records organized and track purchase history easily.</p>
+ </div>
 
-    <p>
-        Powerful inventory tracking, supplier management and billing system built for modern businesses.
-    </p>
+ <div class="feature-box">
+ <h3>Instant Invoice Generation</h3>
+ <p>Create professional invoices and share them with clients instantly.</p>
+ </div>
+ </div>
+ </div>
+ </section>
 
+ <!-- FEATURES OVERVIEW -->
+ <section class="content-section">
+ <div class="section-header">
+ <h2>Website Features</h2>
+ <p>
+ InventoryPro supports different business users with role-based tools for selling, purchasing, inventory control, invoicing, supplier coordination, and order management.
+ </p>
+ </div>
 
-    <!-- INFO BOXES -->
-    <div class="feature-box-container">
+ <div class="feature-box-container">
+ <div class="feature-box">
+ <h3>Role-Based Dashboards</h3>
+ <p>Separate dashboards provide focused workflows and quick summaries for each type of user.</p>
+ </div>
 
-        <div class="feature-box">
-            <h3>Smart Inventory Tracking</h3>
-            <p>Monitor stock levels in real time and prevent shortages or overstocking.</p>
-        </div>
+ <div class="feature-box">
+ <h3>Order & Invoice Flow</h3>
+ <p>Handle product sales, purchase invoices, previous invoices, and order approvals in one platform.</p>
+ </div>
 
-        <div class="feature-box">
-            <h3>Supplier Management</h3>
-            <p>Keep supplier records organized and track purchase history easily.</p>
-        </div>
+ <div class="feature-box">
+ <h3>Business Visibility</h3>
+ <p>Track spending, stock movement, sales performance, alerts, and supplier activity with ease.</p>
+ </div>
+ </div>
+ </section>
 
-        <div class="feature-box">
-            <h3>Instant Invoice Generation</h3>
-            <p>Create professional invoices and share them with clients instantly.</p>
-        </div>
+ <!-- ROLE FEATURES -->
+ <section class="content-section roles-features-section">
+ <div class="section-header">
+ <h2>Features by User Type</h2>
+ <p>
+ The platform gives different feature sets to supplier-side users and retailer-side users so each role sees what they actually need instead of a cluttered mess.
+ </p>
+ </div>
 
-    </div>
+ <div class="roles-grid">
+ <!-- SUPPLIER FEATURES -->
+ <div class="role-panel supplier-role">
+ <span class="role-badge">Supplier Section/Distrubuter or manufacturer</span>
+ <h3>Supplier Features/Distrubuter or manufacturer</h3>
+ <p>
+ Based on your seller-side project pages, supplier users can manage stock, process incoming orders, create sales invoices, review reports, and respond to business activity quickly.
+ </p>
 
-</div>
+ <div class="role-feature-list">
+ <div class="role-feature-card">
+ <h4>Dashboard Overview</h4>
+ <p>View total products, total sales, total orders, and low stock items from a single dashboard screen.</p>
+ </div>
 
-    <!-- RIGHT SIDE FORM SECTION -->
-    <div class="auth-right">
+ <div class="role-feature-card">
+ <h4>Product Management</h4>
+ <p>Add, update, and manage product listings with inventory visibility for day-to-day stock control.</p>
+ </div>
 
-        <!-- TOP TOGGLE BUTTONS -->
-        <div class="auth-toggle">
-            <button id="loginBtn" class="auth-tab active" onclick="showLogin()">Login</button>
-            <button id="registerBtn" class="auth-tab" onclick="showRegister()">Register</button>
-        </div>
+ <div class="role-feature-card">
+ <h4>Order Handling</h4>
+ <p>Review retailer and small business orders with separate pending, approved, and rejected order states.</p>
+ </div>
 
+ <div class="role-feature-card">
+ <h4>Sales Invoice Generation</h4>
+ <p>Create sales invoices for customer orders and maintain cleaner sales documentation.</p>
+ </div>
 
-        <!-- LOGIN FORM -->
-        <form id="loginForm" class="auth-form active">
+ <div class="role-feature-card">
+ <h4>Reports & Insights</h4>
+ <p>Analyze sales-related activity and business performance through report pages and summary views.</p>
+ </div>
 
-            <h2>Login</h2>
+ <div class="role-feature-card">
+ <h4>Notifications & Low Stock Alerts</h4>
+ <p>Get notified about important updates and monitor low-stock products before they become a problem.</p>
+ </div>
+ </div>
+ </div>
 
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="loginEmail" placeholder="Enter your email" required>
-                <span class="error-msg" id="loginEmailError"></span>
-            </div>
+ <!-- RETAILER FEATURES -->
+ <div class="role-panel retailer-role">
+ <span class="role-badge">Retailer Section/small-scale bussiness</span>
+ <h3>Retailer Features/small-scale bussiness</h3>
+ <p>
+ Based on your buyer-side project pages, retailer users can explore suppliers, add products to cart, generate purchase invoices, and keep records of previous invoice activity.
+ </p>
 
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="loginPassword" placeholder="Enter your password" required>
-                <span class="error-msg" id="loginPasswordError"></span>
-            </div>
+ <div class="role-feature-list">
+ <div class="role-feature-card">
+ <h4>Retailer Dashboard</h4>
+ <p>Track total suppliers, total products purchased, total spending, and invoice counts through the dashboard.</p>
+ </div>
 
-            <button type="submit" class="btn btn-primary">Login</button>
-            <button type="button" class="btn btn-primary">Login With Google</button>
-        </form>
+ <div class="role-feature-card">
+ <h4>Supplier Management</h4>
+ <p>Browse available suppliers, view approved suppliers, and inspect supplier products before purchasing.</p>
+ </div>
 
+ <div class="role-feature-card">
+ <h4>Purchase Invoice Creation</h4>
+ <p>Generate purchase invoices for products obtained from suppliers with organized billing workflow.</p>
+ </div>
 
-        <!-- REGISTER FORM -->
-        <form id="registerForm" class="auth-form">
+ <div class="role-feature-card">
+ <h4>Cart Functionality</h4>
+ <p>Add selected supplier products into a cart before finalizing purchases and invoice generation.</p>
+ </div>
 
-            <h2>Register</h2>
+ <div class="role-feature-card">
+ <h4>Previous Invoices History</h4>
+ <p>Maintain access to older invoices for financial tracking, review, and record management.</p>
+ </div>
 
-            <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" id="registerName" placeholder="Enter your full name" required>
-                <span class="error-msg" id="registerNameError"></span>
-            </div>
+ <div class="role-feature-card">
+ <h4>Spending & Purchase Insights</h4>
+ <p>Check monthly spending, active suppliers, average order value, and recently purchased products.</p>
+ </div>
+ </div>
+ </div>
+ </div>
+ </section>
 
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="registerEmail" placeholder="Enter your email" required>
-                <span class="error-msg" id="registerEmailError"></span>
-            </div>
+ <!-- CTA -->
+ <section class="content-section">
+ <div class="cta-strip">
+ <h3>Start managing your B2B workflow smarter</h3>
+ <p>
+ Use InventoryPro to simplify product tracking, supplier coordination, order processing, invoice generation, and role-based business operations in one system.
+ </p>
+ <div class="cta-actions">
+ <button class="btn btn-primary" onclick="openModal('registerModal')">Create Account</button>
+ <button class="btn btn-secondary" onclick="openModal('loginModal')">Sign In</button>
+ </div>
+ </div>
+ </section>
+ </main>
 
-            <div class="form-group">
-                <label>Role</label>
-                <select id="registerRole" required>
-                    <option value="">Select your role</option>
-                    <option value="wholesaler">Wholesaler</option>
-                    <option value="retailer">Retailer</option>
-                    <option value="small-scale">Small Scale Business Owner</option>
-                    <option value="distributor">Distributor</option>
-                    <option value="manufacturer">Manufacturer</option>
-                </select>
-                <span class="error-msg" id="registerRoleError"></span>
-            </div>
+ <!-- LOGIN MODAL -->
+ <div id="loginModal" class="modal">
+ <div class="modal-content">
+ <span class="close" onclick="closeModal('loginModal')">&times;</span>
 
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="registerPassword" placeholder="Minimum 6 characters" required>
-                <span class="error-msg" id="registerPasswordError"></span>
-            </div>
+ <form id="loginForm" class="auth-form">
+ <h2>Login</h2>
 
-            <button type="submit" class="btn btn-primary">Register</button>
-            <button type="button" class="btn btn-primary">Login With Google</button>
+ <div class="form-group">
+ <label>Email</label>
+ <input type="email" id="loginEmail" placeholder="Enter your email" required>
+ <span class="error-msg" id="loginEmailError"></span>
+ </div>
 
+ <div class="form-group">
+ <label>Password</label>
+ <input type="password" id="loginPassword" placeholder="Enter your password" required>
+ <span class="error-msg" id="loginPasswordError"></span>
+ </div>
 
-        </form>
+ <button type="submit" class="btn btn-primary auth-submit-btn">Login</button>
+ <button type="button" class="btn btn-secondary auth-google-btn">Login With Google</button>
+ </form>
+ </div>
+ </div>
 
+ <!-- REGISTER MODAL -->
+ <div id="registerModal" class="modal">
+ <div class="modal-content">
+ <span class="close" onclick="closeModal('registerModal')">&times;</span>
 
+ <form id="registerForm" class="auth-form">
+ <h2>Register</h2>
 
+ <div class="form-group">
+ <label>Full Name</label>
+ <input type="text" id="registerName" placeholder="Enter your full name" required>
+ <span class="error-msg" id="registerNameError"></span>
+ </div>
 
-<script src="js/auth.js"></script>
+ <div class="form-group">
+ <label>Email</label>
+ <input type="email" id="registerEmail" placeholder="Enter your email" required>
+ <span class="error-msg" id="registerEmailError"></span>
+ </div>
 
-<script>
+ <div class="form-group">
+ <label>Role</label>
+ <select id="registerRole" required>
+ <option value="">Select your role</option>
+ <option value="wholesaler">Wholesaler</option>
+ <option value="retailer">Retailer</option>
+ <option value="small-scale">Small Scale Business Owner</option>
+ <option value="distributor">Distributor</option>
+ <option value="manufacturer">Manufacturer</option>
+ </select>
+ <span class="error-msg" id="registerRoleError"></span>
+ </div>
 
-function showLogin(){
+ <div class="form-group">
+ <label>Password</label>
+ <input type="password" id="registerPassword" placeholder="Minimum 6 characters" required>
+ <span class="error-msg" id="registerPasswordError"></span>
+ </div>
 
-document.getElementById("loginForm").classList.add("active");
-document.getElementById("registerForm").classList.remove("active");
+ <button type="submit" class="btn btn-primary auth-submit-btn">Register</button>
+ <button type="button" class="btn btn-secondary auth-google-btn">Login With Google</button>
+ </form>
+ </div>
+ </div>
 
-document.getElementById("loginBtn").classList.add("active");
-document.getElementById("registerBtn").classList.remove("active");
+ <!-- FOOTER -->
+ <footer class="landing-footer">
+ <div class="footer-container">
+ <p>© 2026 InventoryPro. All rights reserved.</p>
+ </div>
+ </footer>
 
-}
+ <script src="js/auth.js"></script>
+ <script>
+ function openModal(modalId) {
+ document.getElementById(modalId).classList.add("active");
+ }
 
-function showRegister(){
+ function closeModal(modalId) {
+ document.getElementById(modalId).classList.remove("active");
+ }
 
-document.getElementById("registerForm").classList.add("active");
-document.getElementById("loginForm").classList.remove("active");
+ window.onclick = function(event) {
+ const loginModal = document.getElementById("loginModal");
+ const registerModal = document.getElementById("registerModal");
 
-document.getElementById("registerBtn").classList.add("active");
-document.getElementById("loginBtn").classList.remove("active");
+ if (event.target === loginModal) {
+ loginModal.classList.remove("active");
+ }
 
-}
-
-</script>
-
+ if (event.target === registerModal) {
+ registerModal.classList.remove("active");
+ }
+ };
+ </script>
 </body>
 </html>
