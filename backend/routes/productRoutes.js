@@ -10,7 +10,7 @@ router.post("/add", authMiddleware, async (req, res) => {
     return res.status(403).json({ message: "Only wholesalers, distributors, and manufacturers can add products." });
   }
 
-  const { name, price, gst, quantity, description } = req.body;
+  const { name, price, gst, quantity, description, category } = req.body;
 
   const product = new Product({
     name,
@@ -18,6 +18,7 @@ router.post("/add", authMiddleware, async (req, res) => {
     gst,
     stock: Number(quantity),
     description,
+    category,
     owner: req.user.id
   });
 
@@ -59,7 +60,7 @@ router.put("/:id", authMiddleware, async (req, res) => {
 
 try {
 
-const { name, price, gst, stock, description } = req.body;
+const { name, price, gst, stock, description, category } = req.body;
 
 const updatedProduct = await Product.findByIdAndUpdate(
 req.params.id,
@@ -68,7 +69,8 @@ name,
 price,
 gst,
 stock,
-description
+description,
+category
 },
 { returnDocument: "after" });
 
@@ -106,4 +108,15 @@ console.log("[Products] by-supplier", { supplierId: req.params.id, productsCount
 res.json(products);
 
 });
+router.get("/all", authMiddleware, async (req, res) => {
+  try {
+    const products = await Product.find({})
+      .populate("owner", "name email role")
+      .sort({ createdAt: -1 });
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch products" });
+  }
+});
+
 module.exports = router;

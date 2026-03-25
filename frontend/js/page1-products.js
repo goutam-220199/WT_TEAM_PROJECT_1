@@ -37,6 +37,7 @@ const Products = {
 
                 <div class="product-details" style="margin-bottom: 15px;">
                     <span>Stock: ${product.stock} units</span>
+                    <span>Category: ${product.category || 'N/A'}</span>
                     <span>${product.stock < 10 ? '⚠️ Low Stock' : '✓ In Stock'}</span>
                 </div>
 
@@ -52,7 +53,7 @@ const Products = {
 
 
     // STEP 8: Add product using backend API
-    async addProduct(name, price, gst, quantity, description) {
+    async addProduct(name, price, gst, quantity, description, category) {
 
         const token = localStorage.getItem("token");
 
@@ -70,7 +71,8 @@ const Products = {
                 price,
                 gst,
                 quantity,
-                description
+                description,
+                category
             })
 
         });
@@ -91,7 +93,7 @@ const Products = {
 
 
     // Update product
-    async updateProduct(id, name, price, gst, quantity, description) {
+    async updateProduct(id, name, price, gst, quantity, description, category) {
 
         const token = localStorage.getItem("token");
 
@@ -109,7 +111,8 @@ const Products = {
                 price,
                 gst,
                 stock: Number(quantity),
-                description
+                description,
+                category
             })
 
         });
@@ -183,6 +186,7 @@ function editProduct(productId) {
     document.getElementById('productPrice').value = product.price;
     document.getElementById('productGST').value = product.gst;
     document.getElementById('productQuantity').value = product.stock;
+    document.getElementById('productCategory').value = product.category || '';
     document.getElementById('productDescription').value = product.description || '';
 
     openModal('productModal');
@@ -208,31 +212,29 @@ document.addEventListener('DOMContentLoaded', function () {
             const price = document.getElementById('productPrice').value;
             const gst = document.getElementById('productGST').value;
             const quantity = document.getElementById('productQuantity').value;
+            const category = document.getElementById('productCategory').value;
             const description = document.getElementById('productDescription').value;
 
             if (Products.editingProductId) {
-
                 const success = await Products.updateProduct(
                     Products.editingProductId,
                     name,
                     price,
                     gst,
                     quantity,
-                    description
+                    description,
+                    category
                 );
-
                 if (success) closeProductModal();
-
             } else {
-
                 const success = await Products.addProduct(
                     name,
                     price,
                     gst,
                     quantity,
-                    description
+                    description,
+                    category
                 );
-
                 if (success) closeProductModal();
             }
 

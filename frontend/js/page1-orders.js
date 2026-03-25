@@ -14,25 +14,11 @@ const Orders = {
     },
 
     renderOrders() {
-        const pendingGrid = document.getElementById('pendingOrdersGrid');
-        const approvedGrid = document.getElementById('approvedOrdersGrid');
-        const rejectedGrid = document.getElementById('rejectedOrdersGrid');
+        const grid = document.getElementById('ordersGrid');
 
-        const pending = this.orders.filter(o => o.status === 'pending');
-        const approved = this.orders.filter(o => o.status === 'approved');
-        const rejected = this.orders.filter(o => o.status === 'rejected');
-
-        pendingGrid.innerHTML = pending.length === 0
-            ? '<p class="empty-state">No pending orders</p>'
-            : pending.map(order => this.renderOrderCard(order)).join('');
-
-        approvedGrid.innerHTML = approved.length === 0
-            ? '<p class="empty-state">No approved orders</p>'
-            : approved.map(order => this.renderOrderCard(order)).join('');
-
-        rejectedGrid.innerHTML = rejected.length === 0
-            ? '<p class="empty-state">No rejected orders</p>'
-            : rejected.map(order => this.renderOrderCard(order)).join('');
+        grid.innerHTML = this.orders.length === 0
+            ? '<p class="empty-state">No orders found</p>'
+            : this.orders.map(order => this.renderOrderCard(order)).join('');
     },
 
     renderOrderCard(order) {
@@ -40,7 +26,7 @@ const Orders = {
         const products = order.items.map(i => `${i.name} (x${i.quantity})`).join(', ');
 
         return `
-            <div class="order-card">
+            <div class="order-card" style="width: 100%; max-width: none;">
                 <div class="order-header">
                     <div class="order-id">Order #${order._id.slice(-6).toUpperCase()}</div>
                     <div class="order-status ${order.status}">${order.status.charAt(0).toUpperCase() + order.status.slice(1)}</div>
@@ -52,44 +38,17 @@ const Orders = {
                     <strong>Total Amount:</strong> ₹${total.toFixed(2)}
                 </div>
                 <div class="order-actions">
-                    ${order.status === 'pending' ? `
-                        <button class="btn btn-success" onclick="approveOrder('${order._id}')">Approve</button>
-                        <button class="btn btn-danger" onclick="rejectOrder('${order._id}')">Reject</button>
-                    ` : `
-                        <button class="btn btn-secondary" disabled>${order.status.charAt(0).toUpperCase() + order.status.slice(1)}</button>
-                    `}
+                    <button class="btn btn-secondary" disabled>Automatically Approved</button>
+                    <button class="btn btn-primary" onclick="viewOrderDetails('${order._id}')">View Details</button>
                 </div>
             </div>
         `;
-    },
-
-    async approveOrder(orderId) {
-        const token = localStorage.getItem('token');
-        await fetch(`http://localhost:5000/api/orders/approve/${orderId}`, {
-            method: 'PUT',
-            headers: { Authorization: 'Bearer ' + token }
-        });
-        showToast('Order approved successfully!', 'success');
-        await this.loadOrders();
-    },
-
-    async rejectOrder(orderId) {
-        const token = localStorage.getItem('token');
-        await fetch(`http://localhost:5000/api/orders/reject/${orderId}`, {
-            method: 'PUT',
-            headers: { Authorization: 'Bearer ' + token }
-        });
-        showToast('Order rejected!', 'success');
-        await this.loadOrders();
     }
 };
 
-function approveOrder(orderId) {
-    Orders.approveOrder(orderId);
-}
-
-function rejectOrder(orderId) {
-    Orders.rejectOrder(orderId);
+function viewOrderDetails(orderId) {
+    // Placeholder for viewing details if needed, for now just show a message
+    showToast('Order details for ' + orderId, 'info');
 }
 
 // Initialize on page load

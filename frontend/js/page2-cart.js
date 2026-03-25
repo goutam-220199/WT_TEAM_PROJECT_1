@@ -80,7 +80,7 @@ async function placeOrder() {
 
   const supplierId = cart[0].supplierId;
   const items = cart.map(item => ({
-    productId: item.productId,
+    product: item.productId,
     name: item.name,
     quantity: item.quantity,
     price: item.price,

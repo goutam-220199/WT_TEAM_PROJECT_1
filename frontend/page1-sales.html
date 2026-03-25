@@ -33,58 +33,8 @@
         <div class="sales-container">
             <div class="page-header">
                 <h2>Sales Invoice</h2>
-                <button class="btn btn-primary" onclick="openNewInvoice()">Create New Invoice</button>
             </div>
 
-            <div class="invoice-form" id="invoiceForm" style="display: none;">
-                <div class="form-section">
-                    <h3>Invoice Details</h3>
-                    
-                    <div class="form-group">
-                        <label for="invoiceDate">Invoice Date</label>
-                        <input type="date" id="invoiceDate" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="customerName">Customer Name</label>
-                        <input type="text" id="customerName" placeholder="Enter customer name" required>
-                    </div>
-
-                    <h3 style="margin-top: 20px;">Add Products</h3>
-
-                    <div class="products-list" id="productsList">
-                        <div class="product-row">
-                            <select class="product-select" onchange="updatePrice(this)">
-                                <option value="">Select Product</option>
-                            </select>
-                            <input type="number" class="product-qty" placeholder="Qty" min="1" onchange="calculateInvoiceTotal()">
-                            <input type="number" class="product-price" placeholder="Price" readonly>
-                            <input type="number" class="product-gst" placeholder="GST %" readonly>
-                            <button type="button" class="btn btn-delete" onclick="removeProductRow(this)">Remove</button>
-                        </div>
-                    </div>
-
-                    <button type="button" class="btn btn-secondary" onclick="addProductRow()">Add Product Row</button>
-
-                    <div class="invoice-summary">
-                        <div class="summary-row">
-                            <span>Subtotal:</span>
-                            <span id="subtotal">₹0</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>GST:</span>
-                            <span id="gstAmount">₹0</span>
-                        </div>
-                        <div class="summary-row total">
-                            <span>Total Amount:</span>
-                            <span id="totalAmount">₹0</span>
-                        </div>
-                    </div>
-
-                    <button type="button" class="btn btn-primary" onclick="createInvoice()">Create Invoice</button>
-                    <button type="button" class="btn btn-secondary" onclick="cancelInvoice()">Cancel</button>
-                </div>
-            </div>
 
             <div class="invoices-list" id="invoicesList">
                 <h3>Previous Invoices</h3>

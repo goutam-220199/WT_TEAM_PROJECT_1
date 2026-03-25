@@ -1,268 +1,52 @@
 // Page 1 Sales Invoice
 const Sales = {
+    invoices: [],
 
-products: [],
-invoices: [],
+    async loadPreviousInvoices() {
+        const token = localStorage.getItem("token");
+        const res = await fetch("http://localhost:5000/api/invoices/my-invoices", {
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        });
 
-async loadProducts() {
+        this.invoices = await res.json();
 
-const token = localStorage.getItem("token");
+        const container = document.getElementById('previousInvoices');
 
-const res = await fetch("http://localhost:5000/api/products/my-products",{
+        if (this.invoices.length === 0) {
+            container.innerHTML = '<p class="empty-state">No invoices generated yet. Invoices are automatically created when orders are placed.</p>';
+            return;
+        }
 
-headers:{
-"Authorization":"Bearer "+token
-}
-
-});
-
-this.products = await res.json();
-
-},
-
-loadProductsInSelect() {
-
-const selects = document.querySelectorAll('.product-select');
-
-const productOptions = this.products.map(p => 
-`<option value="${p._id}" data-price="${p.price}" data-gst="${p.gst}">
-${p.name} - ₹${p.price}
-</option>`
-).join('');
-
-selects.forEach(select=>{
-select.innerHTML = '<option value="">Select Product</option>' + productOptions;
-});
-
-},
-
-async loadPreviousInvoices(){
-
-const token = localStorage.getItem("token");
-
-const res = await fetch("http://localhost:5000/api/invoices/my-invoices",{
-
-headers:{
-"Authorization":"Bearer "+token
-}
-
-});
-
-this.invoices = await res.json();
-
-
-
-const container = document.getElementById('previousInvoices');
-
-if (this.invoices.length === 0) {
-container.innerHTML = '<p class="empty-state">No invoices created yet</p>';
-return;
-}
-
-container.innerHTML = this.invoices.map(invoice => `
-<div style="background:#f9f9f9;padding:15px;margin-bottom:10px;border-radius:4px;border-left:4px solid #000;">
-
-<div style="display:flex;justify-content:space-between;margin-bottom:10px;">
-<strong>Invoice #${invoice._id}</strong>
-<span style="color:#666;font-size:12px;">
-${new Date(invoice.createdAt).toLocaleDateString()}
-</span>
-</div>
-
-<div style="font-size:13px;color:#666;margin-bottom:8px;">
-Product: ${invoice.product?.name || "Product"}
-</div>
-
-<div style="font-size:13px;color:#666;margin-bottom:8px;">
-Quantity: ${invoice.quantity}
-</div>
-
-<div style="font-size:13px;color:#666;margin-bottom:8px;">
-Total: <strong>₹${invoice.total}</strong>
-</div>
-
-<button class="btn btn-secondary"
-onclick="downloadInvoice('${invoice._id}')">
-Download Invoice
-</button>
-
-</div>
-`).join('');
-
-}
-
+        container.innerHTML = this.invoices.map(invoice => `
+            <div style="background:#f9f9f9;padding:15px;margin-bottom:10px;border-radius:4px;border-left:4px solid #000;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+                    <strong>Invoice #${invoice._id}</strong>
+                    <span style="color:#666;font-size:12px;">
+                        ${new Date(invoice.createdAt).toLocaleDateString()}
+                    </span>
+                </div>
+                <div style="font-size:13px;color:#666;margin-bottom:8px;">
+                    Product: ${invoice.product?.name || "Product"}
+                </div>
+                <div style="font-size:13px;color:#666;margin-bottom:8px;">
+                    Quantity: ${invoice.quantity}
+                </div>
+                <div style="font-size:13px;color:#666;margin-bottom:8px;">
+                    Total: <strong>₹${invoice.total}</strong>
+                </div>
+                <button class="btn btn-secondary" onclick="downloadInvoice('${invoice._id}')">
+                    Download Invoice
+                </button>
+            </div>
+        `).join('');
+    }
 };
 
-
-function openNewInvoice(){
-
-document.getElementById('invoiceForm').style.display='block';
-document.getElementById('invoicesList').style.display='none';
-
-const today = new Date().toISOString().split('T')[0];
-document.getElementById('invoiceDate').value = today;
-
-Sales.loadProductsInSelect();
-
-}
-
-
-function cancelInvoice(){
-
-document.getElementById('invoiceForm').style.display='none';
-document.getElementById('invoicesList').style.display='block';
-
-document.getElementById('invoiceForm').reset();
-
-}
-
-
-function addProductRow(){
-
-const container=document.getElementById('productsList');
-
-const newRow=document.createElement('div');
-
-newRow.className='product-row';
-
-newRow.innerHTML=`
-
-<select class="product-select" onchange="updatePrice(this)">
-<option value="">Select Product</option>
-</select>
-
-<input type="number" class="product-qty" placeholder="Qty" min="1" onchange="calculateInvoiceTotal()">
-
-<input type="number" class="product-price" readonly>
-
-<input type="number" class="product-gst" readonly>
-
-<button type="button" class="btn btn-delete" onclick="removeProductRow(this)">Remove</button>
-
-`;
-
-container.appendChild(newRow);
-
-Sales.loadProductsInSelect();
-
-}
-
-
-function removeProductRow(btn){
-
-btn.parentElement.remove();
-
-calculateInvoiceTotal();
-
-}
-
-
-function updatePrice(select){
-
-const option=select.options[select.selectedIndex];
-
-const price=option.getAttribute('data-price') || 0;
-const gst=option.getAttribute('data-gst') || 0;
-
-const row=select.closest('.product-row');
-
-row.querySelector('.product-price').value=price;
-row.querySelector('.product-gst').value=gst;
-
-calculateInvoiceTotal();
-
-}
-
-
-function calculateInvoiceTotal(){
-
-const rows=document.querySelectorAll('.product-row');
-
-let subtotal=0;
-let totalGst=0;
-
-rows.forEach(row=>{
-
-const qty=parseInt(row.querySelector('.product-qty').value)||0;
-const price=parseFloat(row.querySelector('.product-price').value)||0;
-const gst=parseFloat(row.querySelector('.product-gst').value)||0;
-
-const lineTotal=qty*price;
-const lineGst=(lineTotal*gst)/100;
-
-subtotal+=lineTotal;
-totalGst+=lineGst;
-
-});
-
-const total=subtotal+totalGst;
-
-document.getElementById('subtotal').textContent='₹'+subtotal.toFixed(2);
-document.getElementById('gstAmount').textContent='₹'+totalGst.toFixed(2);
-document.getElementById('totalAmount').textContent='₹'+total.toFixed(2);
-
-}
-
-
-async function createInvoice(){
-
-const customerName=document.getElementById('customerName').value;
-
-const rows=document.querySelectorAll('.product-row');
-
-if(!customerName){
-
-showToast("Enter customer name","error");
-
-return;
-
-}
-
-const token=localStorage.getItem("token");
-
-for(const row of rows){
-
-const productId=row.querySelector('.product-select').value;
-const qty=parseInt(row.querySelector('.product-qty').value)||0;
-
-if(productId && qty>0){
-
-await fetch("http://localhost:5000/api/invoices/create",{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json",
-"Authorization":"Bearer "+token
-},
-
-body:JSON.stringify({
-productId:productId,
-quantity:qty
-})
-
-});
-
-}
-
-}
-
-showToast("Invoice created successfully","success");
-
-cancelInvoice();
-
-Sales.loadPreviousInvoices();
-
-}
-
-
 // Initialize
-document.addEventListener("DOMContentLoaded", async ()=>{
-
-await Sales.loadProducts();
-
-Sales.loadPreviousInvoices();
-
+document.addEventListener("DOMContentLoaded", async () => {
+    Sales.loadPreviousInvoices();
 });
 async function downloadInvoice(id){
 

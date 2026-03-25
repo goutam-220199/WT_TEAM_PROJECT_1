@@ -32,12 +32,36 @@ router.post("/", authMiddleware, async (req, res) => {
       retailer: req.user.id,
       supplier: supplierId,
       items,
-      status: "pending"
+      status: "approved"
     });
 
     await order.save();
 
-    res.json({ message: "Order placed successfully", order });
+    // Create invoice records and reduce stock immediately
+    await Promise.all(items.map(async item => {
+      const product = await Product.findById(item.product);
+      if (!product) return;
+
+      if (product.stock >= item.quantity) {
+        product.stock -= item.quantity;
+        await product.save();
+      }
+
+      const invoice = new Invoice({
+        product: item.product,
+        supplier: product.name,
+        quantity: item.quantity,
+        price: item.price,
+        gst: item.gst,
+        gstAmount: (item.price * item.gst / 100) * item.quantity,
+        total: item.total,
+        owner: req.user.id
+      });
+
+      await invoice.save();
+    }));
+
+    res.json({ message: "Order placed and approved automatically", order });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Failed to place order" });
