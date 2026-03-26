@@ -8,6 +8,11 @@ type:String,
 required:true
 },
 
+category: {
+type: String,
+default: "General"
+},
+
 price:{
 type:Number,
 required:true

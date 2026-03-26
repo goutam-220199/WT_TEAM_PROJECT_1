@@ -1,5 +1,18 @@
 // Page 2 Cart
 
+function ensureRetailerPage() {
+  const role = localStorage.getItem('role');
+  if (!role) {
+    window.location.href = 'index.html';
+    return false;
+  }
+  if (role === 'wholesaler' || role === 'manufacturer' || role === 'distributor') {
+    window.location.href = 'page1-dashboard.html';
+    return false;
+  }
+  return true;
+}
+
 function getCart() {
   return JSON.parse(localStorage.getItem("cart")) || [];
 }
@@ -14,27 +27,50 @@ function formatCurrency(value) {
 
 function renderCart() {
   const cart = getCart();
-  const tbody = document.getElementById('cartBody');
+  const container = document.getElementById('cartContainer');
 
   if (cart.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Your cart is empty.</td></tr>';
+    container.innerHTML = '<p class="empty-state">Your cart is empty.</p>';
     updateTotals();
     return;
   }
 
-  tbody.innerHTML = cart.map((item, index) => {
-    const itemTotal = (item.price * item.quantity) + ((item.price * item.gst / 100) * item.quantity);
-    return `
-      <tr>
-        <td>${item.name}</td>
-        <td><input type="number" min="1" max="${item.stock}" value="${item.quantity}" onchange="updateCartQuantity(${index}, this.value)"></td>
-        <td>${formatCurrency(item.price)}</td>
-        <td>${item.gst}%</td>
-        <td>${formatCurrency(itemTotal)}</td>
-        <td><button class="btn btn-danger" onclick="removeCartItem(${index})">Remove</button></td>
-      </tr>
-    `;
-  }).join('');
+  // Group by category
+  const categories = {};
+  cart.forEach((item, index) => {
+    const cat = item.category || "General";
+    if (!categories[cat]) categories[cat] = [];
+    categories[cat].push({ ...item, index });
+  });
+
+  container.innerHTML = "";
+  for (const [cat, items] of Object.entries(categories)) {
+    const section = document.createElement("div");
+    section.className = "cart-section";
+    section.innerHTML = `<h3>${cat}</h3>`;
+
+    const grid = document.createElement("div");
+    grid.className = "cart-grid";
+
+    items.forEach(({ index, ...item }) => {
+      const card = document.createElement("div");
+      card.className = "cart-card";
+      const itemTotal = (item.price * item.quantity) + ((item.price * item.gst / 100) * item.quantity);
+      card.innerHTML = `
+        <h4>${item.name}</h4>
+        <p>Price: ${formatCurrency(item.price)}</p>
+        <p>GST: ${item.gst}%</p>
+        <p>Quantity: <input type="number" min="1" max="${item.stock}" value="${item.quantity}" class="quantity-input" onchange="updateCartQuantity(${index}, this.value)"></p>
+        <p>Total: ${formatCurrency(itemTotal)}</p>
+        <button class="order-btn" onclick="orderProduct(${index})">Order Product</button>
+        <button class="btn btn-danger" onclick="removeCartItem(${index})" style="margin-left: 10px;">Remove</button>
+      `;
+      grid.appendChild(card);
+    });
+
+    section.appendChild(grid);
+    container.appendChild(section);
+  }
 
   updateTotals();
 }
@@ -71,22 +107,18 @@ function removeCartItem(index) {
   renderCart();
 }
 
-async function placeOrder() {
+async function orderProduct(index) {
   const cart = getCart();
-  if (cart.length === 0) {
-    showToast('Add items to cart before placing an order', 'error');
-    return;
-  }
+  const item = cart[index];
 
-  const supplierId = cart[0].supplierId;
-  const items = cart.map(item => ({
-    productId: item.productId,
-    name: item.name,
+  const supplierId = item.supplierId;
+  const items = [{
+    product: item.productId,
     quantity: item.quantity,
     price: item.price,
     gst: item.gst,
     total: (item.price * item.quantity) + ((item.price * item.gst / 100) * item.quantity)
-  }));
+  }];
 
   const token = localStorage.getItem('token');
 
@@ -107,14 +139,83 @@ async function placeOrder() {
       return;
     }
 
-    // Clear cart once order is placed
-    localStorage.removeItem('cart');
+    if (data.order && data.order.status === 'low_stock') {
+      showToast('Stock is low for this product. Order not placed.', 'error');
+      return;
+    }
+
+    cart.splice(index, 1);
+    saveCart(cart);
     renderCart();
 
-    showToast('Order placed successfully. Supplier will receive a notification.', 'success');
+    showToast('Order placed successfully.', 'success');
   } catch (err) {
     console.error(err);
     showToast('Failed to place order', 'error');
+  }
+}
+
+async function placeOrder() {
+  const cart = getCart();
+  if (cart.length === 0) {
+    showToast('Add items to cart before placing an order', 'error');
+    return;
+  }
+
+  const groupedBySupplier = cart.reduce((groups, item) => {
+    if (!groups[item.supplierId]) groups[item.supplierId] = [];
+    groups[item.supplierId].push(item);
+    return groups;
+  }, {});
+
+  const token = localStorage.getItem('token');
+  const results = [];
+
+  for (const supplierId in groupedBySupplier) {
+    const items = groupedBySupplier[supplierId].map(item => ({
+      product: item.productId,
+      quantity: item.quantity,
+      price: item.price,
+      gst: item.gst,
+      total: (item.price * item.quantity) + ((item.price * item.gst / 100) * item.quantity)
+    }));
+
+    try {
+      const res = await fetch('http://localhost:5000/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + token
+        },
+        body: JSON.stringify({ supplierId, items })
+      });
+      const data = await res.json();
+
+      if (!res.ok || (data.order && data.order.status === 'low_stock')) {
+        results.push({ supplierId, success: false, message: data.message || 'Stock low or order failed' });
+        continue;
+      }
+
+      results.push({ supplierId, success: true, orderId: data.order._id });
+    } catch (err) {
+      console.error(err);
+      results.push({ supplierId, success: false, message: 'Network error' });
+    }
+  }
+
+  // Remove successfully ordered items from cart
+  const failedSuppliers = results.filter(r => !r.success).map(r => r.supplierId);
+  const updatedCart = cart.filter(item => failedSuppliers.includes(item.supplierId));
+  saveCart(updatedCart);
+  renderCart();
+
+  if (results.some(r => r.success)) {
+    showToast('Order(s) placed successfully.', 'success');
+  }
+
+  const failed = results.filter(r => !r.success);
+  if (failed.length) {
+    showToast('Some orders failed due to low stock or errors.', 'error');
   }
 }
 

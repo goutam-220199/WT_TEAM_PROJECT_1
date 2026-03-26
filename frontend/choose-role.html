@@ -1,0 +1,69 @@
+<html>
+<head>
+  <title>Select your role</title>
+</head>
+
+<body>
+<h2>Select Your Role</h2>
+
+<select id="role">
+  <option value="retailer">Retailer</option>
+  <option value="wholesaler">Wholesaler</option>
+  <option value="manufacturer">Manufacturer</option>
+  <option value="distributor">Distributor</option>
+  <option value="small-scale-business">Small-scale Business</option>
+</select>
+
+<button onclick="saveRole()">Continue</button>
+
+<script>
+// ✅ STEP 1: Extract token from URL
+const params = new URLSearchParams(window.location.search);
+const tokenFromUrl = params.get("token");
+
+if (tokenFromUrl) {
+  // ✅ STEP 2: Store token in localStorage
+  localStorage.setItem("token", tokenFromUrl);
+} else {
+  console.error("Token not found in URL");
+}
+
+// ✅ STEP 3: Save role
+function saveRole() {
+  const role = document.getElementById("role").value;
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    alert("Token missing. Please login again.");
+    return;
+  }
+
+  fetch("http://localhost:5000/auth/set-role", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    },
+    body: JSON.stringify({ role })
+  })
+  .then(res => res.json())
+  .then(data => {
+    console.log(data);
+
+    localStorage.setItem("role", role);
+
+    // ✅ Redirect based on role
+    if (role === "retailer" || role === "small-scale-business") {
+      window.location.href = "page2-suppliers.html";
+    } else {
+      window.location.href = "page1-dashboard.html";
+    }
+  })
+  .catch(err => {
+    console.error("Error setting role:", err);
+  });
+}
+</script>
+
+</body>
+</html>

@@ -1,5 +1,18 @@
 // Page 2 Suppliers Management
 
+function ensureRetailerPage() {
+  const role = localStorage.getItem('role');
+  if (!role) {
+    window.location.href = 'index.html';
+    return false;
+  }
+  if (role === 'wholesaler' || role === 'manufacturer' || role === 'distributor') {
+    window.location.href = 'page1-dashboard.html';
+    return false;
+  }
+  return true;
+}
+
 const Suppliers = {
 
 async loadAvailableSuppliers(){
@@ -182,71 +195,7 @@ async function requestSupplier(supplierId){
 -----------------------------*/
 
 async function viewSupplierProducts(supplierId){
-  const token = localStorage.getItem("token");
-
-  try {
-
-const res = await fetch(
-`http://localhost:5000/api/products/by-supplier/${supplierId}`,
-{
-headers:{ Authorization:"Bearer "+token }
-});
-
-const products = await res.json();
-
-    console.log("[Suppliers] viewSupplierProducts", { supplierId, productsCount: products?.length, products: products?.slice(0, 3) }); // log first 3 products
-
-    const productsList = document.getElementById("supplierProductsList");
-
-    if(!productsList) {
-      console.error("[Suppliers] productsList element not found");
-      return;
-    }
-
-    if(!products || products.length === 0){
-openModal("productsModal");
-
-return;
-
-}
-
-productsList.innerHTML = products.map(product => `
-
-<div style="padding:15px;border:1px solid #e0e0e0;border-radius:4px;margin-bottom:10px">
-
-<div style="display:flex;justify-content:space-between;margin-bottom:10px">
-
-<strong>${product.name}</strong>
-
-<span>₹${product.price}</span>
-
-</div>
-
-<div style="font-size:13px;color:#666">
-
-GST: ${product.gst}% | Stock: ${product.stock}
-
-</div>
-
-<button class="btn btn-primary"
-onclick="addToCart('${product._id}','${product.owner}','${product.name}','${product.price}','${product.gst}','${product.stock}')">
-Add to Cart
-</button>
-
-</div>
-
-`).join("");
-
-openModal("productsModal");
-
-  } catch (err) {
-    console.error("[Suppliers] viewSupplierProducts error", err);
-    const productsList = document.getElementById("supplierProductsList");
-    if (productsList) {
-      productsList.innerHTML = '<p class="empty-state">Unable to load products</p>';
-      openModal("productsModal");
-    }
-  }
+  window.location.href = `supplier-products.html?supplierId=${supplierId}`;
 }
 
 
@@ -317,15 +266,16 @@ async function addToCart(productId, supplierId, name, price, gst, stock){
 -----------------------------*/
 
 document.addEventListener("DOMContentLoaded",function(){
+  if (!ensureRetailerPage()) return;
 
-Suppliers.loadAvailableSuppliers();
-Suppliers.loadApprovedSuppliers();
+  Suppliers.loadAvailableSuppliers();
+  Suppliers.loadApprovedSuppliers();
 
-// auto refresh every 10 seconds
-setInterval(()=>{
-Suppliers.loadAvailableSuppliers();
-Suppliers.loadApprovedSuppliers();
-},10000);
+  // auto refresh every 10 seconds
+  setInterval(()=>{
+    Suppliers.loadAvailableSuppliers();
+    Suppliers.loadApprovedSuppliers();
+  },10000);
 
 });
 async function deleteSupplier(id){

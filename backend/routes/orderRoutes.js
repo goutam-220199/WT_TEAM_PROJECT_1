@@ -28,14 +28,66 @@ router.post("/", authMiddleware, async (req, res) => {
       return res.status(400).json({ message: "Supplier is not approved. Request supplier first." });
     }
 
+    let hasInsufficientStock = false;
+    let triggersLowStockAlert = false;
+
+    // Check stock for all items
+    for (const item of items) {
+      const product = await Product.findById(item.product);
+      if (product) {
+        const currentStock = Number(product.stock);
+        const orderQty = Number(item.quantity);
+        
+        if (currentStock < orderQty) {
+          hasInsufficientStock = true;
+        }
+        
+        // Trigger alert if stock is already low OR will become low (< 10)
+        if (currentStock < 10 || (currentStock - orderQty) < 10) {
+          triggersLowStockAlert = true;
+        }
+      }
+    }
+
+    const orderStatus = hasInsufficientStock ? "low_stock" : "approved";
+
     const order = new Order({
       retailer: req.user.id,
       supplier: supplierId,
       items,
-      status: "pending"
+      status: orderStatus,
+      lowStockAlert: triggersLowStockAlert || hasInsufficientStock
     });
 
     await order.save();
+
+    if (!hasInsufficientStock) {
+      // Auto-approve logic: Deduct stock and Create Invoices
+      await Promise.all(order.items.map(async item => {
+        const product = await Product.findById(item.product);
+        if (!product) return;
+
+        // Reduce stock
+        if (product.stock >= item.quantity) {
+          product.stock -= item.quantity;
+          await product.save();
+        }
+
+        const invoice = new Invoice({
+          product: item.product,
+          supplier: order.supplier,
+          retailer: order.retailer,
+          quantity: item.quantity,
+          price: item.price,
+          gst: item.gst,
+          gstAmount: (item.price * item.gst / 100) * item.quantity,
+          total: item.total,
+          owner: order.retailer
+        });
+
+        await invoice.save();
+      }));
+    }
 
     res.json({ message: "Order placed successfully", order });
   } catch (error) {

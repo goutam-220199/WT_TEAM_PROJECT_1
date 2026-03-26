@@ -58,6 +58,11 @@ body {
     color: var(--primary-color);
     margin-bottom: 8px;
     letter-spacing: -0.5px;
+    border: 3px solid #000;          /* border */
+    background-color: #fff;          /* optional clean background */
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1); /* soft shadow */
+
+   transition: var(--transition);
 }
 
 .tagline {
@@ -1360,3 +1365,16 @@ border-radius:8px;
     color: #333;
     line-height: 1.4;
 }
+.site-logo {
+    width: 400px;
+    max-width: 90%;
+    height: 200px;
+    display: block;
+    padding: 10px;
+    border-radius: 50px;
+    border: 3px solid #000;          /* border */
+    background-color: #fff;          /* optional clean background */
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1); /* soft shadow */
+  
+    transition: var(--transition);
+  }
