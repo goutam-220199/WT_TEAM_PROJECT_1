@@ -7,7 +7,15 @@ type:mongoose.Schema.Types.ObjectId,
 ref:"Product"
 },
 
-supplier:String,
+supplier:{
+  type:mongoose.Schema.Types.ObjectId,
+  ref:"User"
+},
+
+retailer:{
+  type:mongoose.Schema.Types.ObjectId,
+  ref:"User"
+},
 
 quantity:Number,
 
@@ -20,8 +28,8 @@ gstAmount:Number,
 total:Number,
 
 owner:{
-type:mongoose.Schema.Types.ObjectId,
-ref:"User"
+  type:mongoose.Schema.Types.ObjectId,
+  ref:"User"
 },
 
 createdAt:{

@@ -42,6 +42,15 @@ router.get("/all", authMiddleware, async (req, res) => {
   }
 });
 
+router.get("/:id", authMiddleware, async (req, res) => {
+  try {
+    const supplier = await User.findById(req.params.id);
+    if (!supplier) return res.status(404).json({ message: "Supplier not found" });
+    res.json(supplier);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 /* CRUD ROUTES */
 

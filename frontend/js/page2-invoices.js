@@ -2,6 +2,19 @@
 let invoicesData = [];
 let currentInvoiceId = null;
 
+function ensureRetailerPage() {
+    const role = localStorage.getItem('role');
+    if (!role) {
+        window.location.href = 'index.html';
+        return false;
+    }
+    if (role === 'wholesaler' || role === 'manufacturer' || role === 'distributor') {
+        window.location.href = 'page1-dashboard.html';
+        return false;
+    }
+    return true;
+}
+
 async function fetchInvoices() {
     const token = localStorage.getItem('token');
     const res = await fetch('http://localhost:5000/api/orders/my-orders', {
@@ -149,28 +162,74 @@ function downloadInvoice() {
     const status = order.status || 'pending';
     const total = order.items?.reduce((sum, item) => sum + (item.total || 0), 0) || 0;
 
-    let content = `Order ID: ${order._id}\nSupplier: ${supplierName}\nDate: ${orderDate}\nStatus: ${status}\n\nItems:\n`;
+    const content = `
+<!DOCTYPE html>
+<html>
+<head>
+<title>Invoice - ${order._id}</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
+.logo { text-align: center; margin-bottom: 20px; }
+.logo img { width: 120px; }
+.header { text-align: center; font-size: 28px; font-weight: bold; margin-bottom: 20px; color: #333; }
+.details { margin-bottom: 20px; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.details p { margin: 5px 0; font-size: 16px; }
+.table { width: 100%; border-collapse: collapse; margin-bottom: 20px; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.table th, .table td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+.table th { background: #007bff; color: white; font-weight: bold; }
+.table tr:nth-child(even) { background: #f2f2f2; }
+.total { text-align: right; font-size: 20px; font-weight: bold; color: #28a745; margin-top: 20px; }
+</style>
+</head>
+<body>
+<div class="logo"><img src="images/b2blogo.png" alt="B2B Manager Logo"></div>
+<div class="header">Invoice</div>
+<div class="details">
+<p><strong>Order ID:</strong> ${order._id}</p>
+<p><strong>Supplier:</strong> ${supplierName}</p>
+<p><strong>Date:</strong> ${orderDate}</p>
+<p><strong>Status:</strong> ${status}</p>
+</div>
+<table class="table">
+<thead>
+<tr>
+<th>Product</th>
+<th>Quantity</th>
+<th>Price</th>
+<th>GST</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody>
+${order.items?.map(item => `
+<tr>
+<td>${item.name || 'Unknown Product'}</td>
+<td>${item.quantity || 0}</td>
+<td>₹${(item.price || 0).toFixed(2)}</td>
+<td>${item.gst || 0}%</td>
+<td>₹${(item.total || 0).toFixed(2)}</td>
+</tr>
+`).join('')}
+</tbody>
+</table>
+<div class="total">Grand Total: ₹${total.toFixed(2)}</div>
+</body>
+</html>
+`;
 
-    if (order.items && order.items.length > 0) {
-        order.items.forEach(item => {
-            content += `${item.name || 'Unknown Product'} - Qty: ${item.quantity || 0}, Price: ₹${(item.price || 0).toFixed(2)}, GST: ${item.gst || 0}%, Total: ₹${(item.total || 0).toFixed(2)}\n`;
-        });
-    }
-
-    content += `\nGrand Total: ₹${total.toFixed(2)}\n`;
-
-    const blob = new Blob([content], { type: 'text/plain' });
+    const blob = new Blob([content], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `order-${order._id}.txt`;
+    a.download = `invoice-${order._id}.html`;
     a.click();
     URL.revokeObjectURL(url);
 
-    showToast('Order downloaded', 'success');
+    showToast('Invoice downloaded', 'success');
 }
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
+    if (!ensureRetailerPage()) return;
     loadInvoices();
 });
