@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - InventoryPro</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .product-section {
+            margin-bottom: 40px;
+        }
+        .product-section h3 {
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .product-card h4 {
+            margin: 0 0 10px 0;
+        }
+        .product-card p {
+            margin: 5px 0;
+        }
+        .add-to-cart-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .add-to-cart-btn:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <div class="navbar-container">
+            <div class="navbar-logo">
+                <h1 class="logo">InventoryPro</h1>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="page2-dashboard.html" class="nav-link">Dashboard</a></li>
+                <li><a href="page2-products.html" class="nav-link active">Products</a></li>
+                <li><a href="page2-suppliers.html" class="nav-link">Suppliers</a></li>
+                <li><a href="page2-cart.html" class="nav-link">Cart</a></li>
+                <li><a href="page2-invoices.html" class="nav-link">Previous Invoices</a></li>
+                <li><a href="index.html" class="nav-link" onclick="logout(event)">Logout</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="dashboard-container">
+            <div class="page-header">
+                <h2>All Products</h2>
+                <p id="userGreeting" class="user-greeting"></p>
+            </div>
+
+            <div id="productsContainer">
+                <!-- Products will be loaded here -->
+            </div>
+        </div>
+    </main>
+
+    <script src="js/auth.js"></script>
+    <script src="js/navbar.js"></script>
+    <script src="js/page2-products.js"></script>
+</body>
+</html>

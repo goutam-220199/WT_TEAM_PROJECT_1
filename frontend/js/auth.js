@@ -1,3 +1,17 @@
+// Token Ingestion from URL for Google Logins directly to Dashboards
+const urlParams = new URLSearchParams(window.location.search);
+const tokenFromUrl = urlParams.get("token");
+const roleFromUrl = urlParams.get("role");
+
+if (tokenFromUrl) {
+    localStorage.setItem("token", tokenFromUrl);
+    if (roleFromUrl && roleFromUrl !== "null") {
+        localStorage.setItem("role", roleFromUrl);
+    }
+    // Clean URL so token isn't visible
+    window.history.replaceState({}, document.title, window.location.pathname);
+}
+
 // Authentication Module
 const Auth = {
 
@@ -10,7 +24,7 @@ const Auth = {
         return password.length >= 6;
     },
 
-    async register(name, email, role, password) {
+    async register(name, email, role, password, productTypes) {
 
         document.getElementById('registerNameError').textContent = '';
         document.getElementById('registerEmailError').textContent = '';
@@ -34,6 +48,11 @@ const Auth = {
             hasError = true;
         }
 
+        if ((role === 'retailer' || role === 'small-scale') && !productTypes.trim()) {
+            document.getElementById('registerProductTypesError').textContent = 'Product types are required';
+            hasError = true;
+        }
+
         if (!this.validatePassword(password)) {
             document.getElementById('registerPasswordError').textContent = 'Password must be at least 6 characters';
             hasError = true;
@@ -43,12 +62,12 @@ const Auth = {
 
         try {
 
-            const res = await fetch("http://localhost:5000/api/auth/register", {
+            const res = await fetch("http://localhost:5000/auth/register", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ name, email, role, password })
+                body: JSON.stringify({ name, email, role, password, productTypes })
             });
 
             const data = await res.json();
@@ -58,8 +77,18 @@ const Auth = {
                 return false;
             }
 
-            showToast("Account created successfully! Please login.", "success");
-            return true;
+            alert("Registered successfully!");
+
+// Reset register form
+document.getElementById("registerForm").reset();
+
+// Close register modal
+closeModal('registerModal');
+
+// Redirect to login page with email parameter
+window.location.href = "index.html?showLogin=true&email=" + encodeURIComponent(email);
+
+return true;
 
         } catch (err) {
             showToast("Server error", "error");
@@ -88,7 +117,7 @@ const Auth = {
 
         try {
 
-            const res = await fetch("http://localhost:5000/api/auth/login", {
+            const res = await fetch("http://localhost:5000/auth/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -123,6 +152,15 @@ const Auth = {
         localStorage.removeItem("name");
     },
 
+    redirectToCorrectPage() {
+        const role = localStorage.getItem("role");
+        if (role === "wholesaler" || role === "manufacturer" || role === "distributor") {
+            window.location.href = "page1-dashboard.html";
+        } else {
+            window.location.href = "page2-products.html";
+        }
+    },
+
     getToken() {
         return localStorage.getItem("token");
     },
@@ -154,7 +192,7 @@ const Auth = {
         ) {
             window.location.href = "page1-dashboard.html";
         } else {
-            window.location.href = "page2-dashboard.html";
+            window.location.href = "page2-products.html";
         }
     }
 };
@@ -196,14 +234,29 @@ document.addEventListener("DOMContentLoaded", function () {
             const email = document.getElementById("registerEmail").value;
             const role = document.getElementById("registerRole").value;
             const password = document.getElementById("registerPassword").value;
+            const productTypes = document.getElementById("registerProductTypes").value;
 
-            const success = await Auth.register(name, email, role, password);
+            const success = await Auth.register(name, email, role, password, productTypes);
 
             if (success) {
                 registerForm.reset();
             }
 
         });
+
+        // Role change listener
+        const roleSelect = document.getElementById('registerRole');
+        if (roleSelect) {
+            roleSelect.addEventListener('change', function() {
+                const role = this.value;
+                const div = document.getElementById('productTypesDiv');
+                if (role === 'retailer' || role === 'small-scale') {
+                    div.style.display = 'block';
+                } else {
+                    div.style.display = 'none';
+                }
+            });
+        }
 
     }
 

@@ -10,10 +10,12 @@ router.post("/add", authMiddleware, async (req, res) => {
     return res.status(403).json({ message: "Only wholesalers, distributors, and manufacturers can add products." });
   }
 
-  const { name, price, gst, quantity, description } = req.body;
+  const { name, price, gst, quantity, description, category } = req.body;
+  console.log("[Backend] Adding product:", { name, category });
 
   const product = new Product({
     name,
+    category: (category && typeof category === 'string' && category.trim()) ? category.trim() : "General",
     price,
     gst,
     stock: Number(quantity),
@@ -22,6 +24,7 @@ router.post("/add", authMiddleware, async (req, res) => {
   });
 
   await product.save();
+  console.log("[Backend] Product saved with category:", product.category);
 
   res.json(product);
 });
@@ -54,17 +57,24 @@ router.get("/my-products", authMiddleware, async (req, res) => {
 
 });
 
+router.get("/all", authMiddleware, async (req, res) => {
+  const products = await Product.find({}).populate("owner", "name");
+  res.json(products);
+});
+
 //update product
 router.put("/:id", authMiddleware, async (req, res) => {
 
 try {
 
-const { name, price, gst, stock, description } = req.body;
+const { name, price, gst, stock, description, category } = req.body;
+console.log("[Backend] Updating product:", { id: req.params.id, category });
 
 const updatedProduct = await Product.findByIdAndUpdate(
 req.params.id,
 {
 name,
+category: (category && category.trim()) ? category.trim() : "General",
 price,
 gst,
 stock,
@@ -98,8 +108,8 @@ res.status(500).json({ message: "Delete failed" });
 router.get("/by-supplier/:id", authMiddleware, async (req,res)=>{
 
 const products = await Product.find({
-owner:req.params.id
-});
+    owner:req.params.id
+}).populate("owner", "name");
 
 console.log("[Products] by-supplier", { supplierId: req.params.id, productsCount: products.length, userId: req.user.id });
 
