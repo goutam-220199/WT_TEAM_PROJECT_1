@@ -53,12 +53,22 @@ res.status(500).json({message:"Invoice creation failed"});
 
 });
 router.get("/my-invoices", authMiddleware, async(req,res)=>{
+  const role = req.user.role;
+  let query = {};
 
-const invoices = await Invoice.find({
-owner:req.user.id
-}).populate("product");
+  if (role === 'wholesaler' || role === 'manufacturer' || role === 'distributor') {
+    query = { supplier: req.user.id };
+  } else {
+    // retailer or small-scale
+    query = { retailer: req.user.id };
+  }
 
-res.json(invoices);
+  const invoices = await Invoice.find(query)
+    .populate("product")
+    .populate("supplier", "name")
+    .populate("retailer", "name");
+
+  res.json(invoices);
 
 });
 router.get("/stats", authMiddleware, async(req,res)=>{

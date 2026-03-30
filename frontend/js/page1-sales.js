@@ -212,7 +212,7 @@ const rows=document.querySelectorAll('.product-row');
 
 if(!customerName){
 
-showToast("Enter customer name","error");
+alert("Enter customer name");
 
 return;
 
@@ -247,7 +247,7 @@ quantity:qty
 
 }
 
-showToast("Invoice created successfully","success");
+alert("Invoice created successfully");
 
 cancelInvoice();
 
@@ -265,21 +265,26 @@ Sales.loadPreviousInvoices();
 
 });
 async function downloadInvoice(id){
+    try {
+        const token = localStorage.getItem("token");
 
-const token = localStorage.getItem("token");
+        const res = await fetch(`http://localhost:5000/api/invoices/${id}`,{
+            headers:{
+                "Authorization":"Bearer "+token
+            }
+        });
 
-const res = await fetch(`http://localhost:5000/api/invoices/${id}`,{
+        if (!res.ok) {
+            throw new Error('Failed to fetch invoice');
+        }
 
-headers:{
-"Authorization":"Bearer "+token
-}
+        const invoice = await res.json();
 
-});
-
-const invoice = await res.json();
-
-generateInvoicePDF(invoice);
-
+        generateInvoicePDF(invoice);
+    } catch (error) {
+        console.error('Error downloading invoice:', error);
+        alert('Failed to download invoice. Please try again.');
+    }
 }
 function generateInvoicePDF(invoice){
 
@@ -287,25 +292,103 @@ const { jsPDF } = window.jspdf;
 
 const doc = new jsPDF();
 
-doc.setFontSize(18);
-doc.text("InventoryPro Invoice",20,20);
+// Create table rows HTML
+let tableRowsHtml = `
+<tr>
+<td style="padding:10px;border:1px solid #ddd;">${invoice.product.name}</td>
+<td style="padding:10px;border:1px solid #ddd;text-align:center;">${invoice.quantity}</td>
+<td style="padding:10px;border:1px solid #ddd;text-align:right;">₹${invoice.price}</td>
+<td style="padding:10px;border:1px solid #ddd;text-align:right;">₹${invoice.total}</td>
+</tr>
+`;
 
-doc.setFontSize(12);
+let finalTotal = invoice.total;
 
-doc.text("Invoice ID: "+invoice._id,20,40);
+// Full HTML Template
+const htmlContent = `
+<div style="width: 700px; box-sizing: border-box; padding: 20px; margin: 0 auto; background: white; color: #333; font-family: 'Inter', Helvetica, Arial, sans-serif;">
+            
+<table style="width: 100%; margin-bottom: 30px;">
+<tr>
+<td style="width: 50%; vertical-align: middle;">
+<img src="images/b2blogo.png" style="max-height: 50px;">
+<h2 style="margin: 0; font-size: 22px; color: #2c3e50;">InventoryPro</h2>
+</td>
+<td style="width: 50%; text-align: right;">
+<h1 style="margin: 0; font-size: 28px; color: #3498db;">Sales Invoice</h1>
+<p><strong>Invoice #:</strong> ${invoice._id}</p>
+<p><strong>Date:</strong> ${new Date(invoice.createdAt).toLocaleDateString()}</p>
+</td>
+</tr>
+</table>
 
-doc.text("Date: "+new Date(invoice.createdAt).toLocaleDateString(),20,50);
+<div style="background:#f8f9fa;padding:15px;margin-bottom:25px;display:flex;justify-content:space-between;">
+<div>
+<h3>Billed To:</h3>
+<p><strong>Customer Name:</strong> ${invoice.customerName || "Retailer / Guest"}</p>
+</div>
+<div>
+<h3>Order Details:</h3>
+<p><strong>Order ID:</strong> ${invoice.orderId || "Manual Invoice"}</p>
+</div>
+</div>
 
-doc.text("Product: "+invoice.product.name,20,70);
+<table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+<thead>
+<tr style="background:#2c3e50;color:white;">
+<th style="padding:10px;border:1px solid #2c3e50;">Product Name</th>
+<th style="padding:10px;border:1px solid #2c3e50;">Qty</th>
+<th style="padding:10px;border:1px solid #2c3e50;">Price</th>
+<th style="padding:10px;border:1px solid #2c3e50;">Total</th>
+</tr>
+</thead>
+<tbody>
+${tableRowsHtml}
+</tbody>
+</table>
 
-doc.text("Quantity: "+invoice.quantity,20,80);
+<div style="text-align:right;">
+<h2>Grand Total: ₹${Number(finalTotal).toFixed(2)}</h2>
+</div>
 
-doc.text("Price: ₹"+invoice.price,20,90);
+<div style="margin-top:40px;text-align:center;font-size:12px;color:#777;">
+<p>Thank you for your business!</p>
+</div>
 
-doc.text("GST: "+invoice.gst+"%",20,100);
+</div>
+`;
 
-doc.text("Total Amount: ₹"+invoice.total,20,120);
+// Use html2canvas to render HTML to canvas, then add to PDF
+const tempDiv = document.createElement('div');
+tempDiv.innerHTML = htmlContent;
+tempDiv.style.position = 'absolute';
+tempDiv.style.left = '-9999px';
+tempDiv.style.top = '-9999px';
+tempDiv.style.width = '700px';
+document.body.appendChild(tempDiv);
 
-doc.save("invoice-"+invoice._id+".pdf");
+html2canvas(tempDiv, { scale: 2 }).then(canvas => {
+    const imgData = canvas.toDataURL('image/png');
+    const imgWidth = 210; // A4 width in mm
+    const pageHeight = 295; // A4 height in mm
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    let heightLeft = imgHeight;
+    let position = 0;
 
+    doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+
+    while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        doc.addPage();
+        doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+    }
+
+    doc.save("invoice-" + invoice._id + ".pdf");
+    document.body.removeChild(tempDiv);
+}).catch(error => {
+    console.error('Error generating PDF:', error);
+    alert('Failed to generate PDF. Please try again.');
+});
 }

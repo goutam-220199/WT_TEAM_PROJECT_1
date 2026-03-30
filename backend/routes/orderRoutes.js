@@ -28,14 +28,78 @@ router.post("/", authMiddleware, async (req, res) => {
       return res.status(400).json({ message: "Supplier is not approved. Request supplier first." });
     }
 
+    let hasInsufficientStock = false;
+    let triggersLowStockAlert = false;
+
+    // Check stock for all items
+    for (const item of items) {
+      const product = await Product.findById(item.product);
+      if (product) {
+        const currentStock = Number(product.stock);
+        const orderQty = Number(item.quantity);
+        
+        if (currentStock < orderQty) {
+          hasInsufficientStock = true;
+        }
+        
+        // Trigger alert if stock is already low OR will become low (< 10)
+        if (currentStock < 10 || (currentStock - orderQty) < 10) {
+          triggersLowStockAlert = true;
+        }
+      }
+    }
+
+    const orderStatus = hasInsufficientStock ? "low_stock" : "approved";
+
+    const normalizedItems = items.map(item => {
+      const productId = item.product || item.productId;
+      return {
+        product: productId,
+        name: item.name || "",
+        quantity: item.quantity,
+        price: item.price,
+        gst: item.gst,
+        total: item.total
+      };
+    });
+
     const order = new Order({
       retailer: req.user.id,
       supplier: supplierId,
-      items,
-      status: "pending"
+      items: normalizedItems,
+      status: orderStatus,
+      lowStockAlert: triggersLowStockAlert || hasInsufficientStock
     });
 
     await order.save();
+
+    if (!hasInsufficientStock) {
+      // Auto-approve logic: Deduct stock and Create Invoices
+      await Promise.all(order.items.map(async item => {
+        const product = await Product.findById(item.product || item.productId);
+        if (!product) return;
+
+        // Reduce stock
+        if (product.stock >= item.quantity) {
+          product.stock -= item.quantity;
+          await product.save();
+        }
+
+        const invoice = new Invoice({
+          product: item.product,
+          supplier: order.supplier,
+          retailer: order.retailer,
+          quantity: item.quantity,
+          price: item.price,
+          gst: item.gst,
+          gstAmount: (item.price * item.gst / 100) * item.quantity,
+          total: item.total,
+          owner: order.retailer
+        });
+
+        await invoice.save();
+      }));
+    }
 
     res.json({ message: "Order placed successfully", order });
   } catch (error) {
@@ -48,7 +112,17 @@ router.post("/", authMiddleware, async (req, res) => {
 router.get("/my-orders", authMiddleware, async (req, res) => {
   const orders = await Order.find({ retailer: req.user.id })
     .populate("supplier")
+    .populate("items.product")
     .sort({ createdAt: -1 });
+
+  // Ensure item names are set for rendering and invoice pdf
+  orders.forEach(order => {
+    order.items.forEach(item => {
+      if (!item.name && item.product) {
+        item.name = item.product.name;
+      }
+    });
+  });
 
   res.json(orders);
 });
@@ -57,7 +131,17 @@ router.get("/my-orders", authMiddleware, async (req, res) => {
 router.get("/supplier", authMiddleware, async (req, res) => {
   const orders = await Order.find({ supplier: req.user.id })
     .populate("retailer")
+    .populate("items.product")
     .sort({ createdAt: -1 });
+
+  // Ensure item names are set from product if missing
+  orders.forEach(order => {
+    order.items.forEach(item => {
+      if (!item.name && item.product) {
+        item.name = item.product.name;
+      }
+    });
+  });
 
   res.json(orders);
 });

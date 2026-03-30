@@ -24,9 +24,13 @@ const orderSchema = new mongoose.Schema({
       total: Number
     }
   ],
+  lowStockAlert: {
+    type: Boolean,
+    default: false
+  },
   status: {
     type: String,
-    enum: ["pending", "approved", "rejected"],
+    enum: ["pending", "approved", "rejected", "low_stock"],
     default: "pending"
   },
   createdAt: {

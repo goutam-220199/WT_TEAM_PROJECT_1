@@ -138,6 +138,66 @@ const data = await Invoice.aggregate([
 res.json(data);
 
 });
+
+// -------- DAILY SALES FOR CHART (last 7 days) --------
+router.get("/daily-sales", authMiddleware, async (req,res)=>{
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  const result = await Invoice.aggregate([
+    {
+      $match:{
+        owner: new mongoose.Types.ObjectId(req.user.id),
+        createdAt: { $gte: sevenDaysAgo }
+      }
+    },
+    {
+      $group:{
+        _id: {
+          $dateToString: { format: "%Y-%m-%d", date: "$createdAt" }
+        },
+        totalSales: { $sum: "$total" },
+        orderCount: { $sum: 1 }
+      }
+    },
+    {
+      $sort: { "_id": 1 }
+    }
+  ]);
+
+  res.json(result);
+});
+
+// -------- MONTHLY SALES FOR CHART (last 12 months) --------
+router.get("/monthly-sales", authMiddleware, async (req,res)=>{
+  const twelveMonthsAgo = new Date();
+  twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+
+  const result = await Invoice.aggregate([
+    {
+      $match:{
+        owner: new mongoose.Types.ObjectId(req.user.id),
+        createdAt: { $gte: twelveMonthsAgo }
+      }
+    },
+    {
+      $group:{
+        _id:{
+          year: { $year: "$createdAt" },
+          month: { $month: "$createdAt" }
+        },
+        totalSales: { $sum: "$total" },
+        orderCount: { $sum: 1 }
+      }
+    },
+    {
+      $sort: { "_id.year": 1, "_id.month": 1 }
+    }
+  ]);
+
+  res.json(result);
+});
+
 module.exports = router;
 /**
  * @swagger

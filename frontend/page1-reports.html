@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reports - InventoryPro</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body>
     <nav class="navbar" id="navbar">
         <div class="navbar-container">
@@ -111,9 +113,23 @@
                 </div>
 
                 <div class="report-card">
-                    <h3>Sales Comparison</h3>
+                    <h3>Sales Comparison(view of money)</h3>
                     <div class="chart-container">
                         <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="report-card">
+                    <h3>Product-wise Sales</h3>
+                    <div class="chart-container">
+                        <canvas id="productChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="report-card">
+                    <h3>Retailer-wise Sales</h3>
+                    <div class="chart-container">
+                        <canvas id="retailerChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -124,4 +140,5 @@
     <script src="js/navbar.js"></script>
     <script src="js/page1-reports.js"></script>
 </body>
+
 </html>
