@@ -77,8 +77,18 @@ const Auth = {
                 return false;
             }
 
-            showToast("Account created successfully! Please login.", "success");
-            return true;
+            alert("Registered successfully!");
+
+// Reset register form
+document.getElementById("registerForm").reset();
+
+// Close register modal
+closeModal('registerModal');
+
+// Redirect to login page with email parameter
+window.location.href = "index.html?showLogin=true&email=" + encodeURIComponent(email);
+
+return true;
 
         } catch (err) {
             showToast("Server error", "error");
@@ -182,7 +192,7 @@ const Auth = {
         ) {
             window.location.href = "page1-dashboard.html";
         } else {
-            window.location.href = "page2-dashboard.html";
+            window.location.href = "page2-products.html";
         }
     }
 };

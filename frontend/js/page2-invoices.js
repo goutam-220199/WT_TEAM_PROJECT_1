@@ -94,7 +94,7 @@ function viewOrderDetails(orderId) {
     if (order.items && order.items.length > 0) {
         itemsHtml = order.items.map(item => `
             <tr>
-                <td>${item.name || 'Unknown Product'}</td>
+                <td>${item.name || item.product?.name || 'Unknown Product'}</td>
                 <td>${item.quantity || 0}</td>
                 <td>₹${(item.price || 0).toFixed(2)}</td>
                 <td>${item.gst || 0}%</td>
@@ -156,6 +156,13 @@ function downloadInvoice() {
     if (!currentInvoiceId) return;
     const order = invoicesData.find(order => order._id === currentInvoiceId);
     if (!order) return;
+
+    generatePurchaseInvoicePDF(order);
+}
+
+function generatePurchaseInvoicePDF(order) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
 
     const supplierName = order.supplier?.name || 'Unknown Supplier';
     const orderDate = order.createdAt ? new Date(order.createdAt).toLocaleDateString() : '';

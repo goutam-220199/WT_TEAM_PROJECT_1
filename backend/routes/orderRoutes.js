@@ -100,7 +100,17 @@ router.post("/", authMiddleware, async (req, res) => {
 router.get("/my-orders", authMiddleware, async (req, res) => {
   const orders = await Order.find({ retailer: req.user.id })
     .populate("supplier")
+    .populate("items.product")
     .sort({ createdAt: -1 });
+
+  // Ensure item names are set for rendering and invoice pdf
+  orders.forEach(order => {
+    order.items.forEach(item => {
+      if (!item.name && item.product) {
+        item.name = item.product.name;
+      }
+    });
+  });
 
   res.json(orders);
 });
@@ -109,7 +119,17 @@ router.get("/my-orders", authMiddleware, async (req, res) => {
 router.get("/supplier", authMiddleware, async (req, res) => {
   const orders = await Order.find({ supplier: req.user.id })
     .populate("retailer")
+    .populate("items.product")
     .sort({ createdAt: -1 });
+
+  // Ensure item names are set from product if missing
+  orders.forEach(order => {
+    order.items.forEach(item => {
+      if (!item.name && item.product) {
+        item.name = item.product.name;
+      }
+    });
+  });
 
   res.json(orders);
 });
