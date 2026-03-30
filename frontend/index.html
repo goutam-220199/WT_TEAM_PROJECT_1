@@ -704,7 +704,7 @@
     top: 20px;
     left: 20px;
     font-size: 30px;
-    font-weight: bold;">InventoryPro</span>
+    font-weight: bold;"">InventoryPro</span>
 </h1>
  </div>
  
@@ -888,7 +888,7 @@
  <div id="loginModal" class="modal">
  <div class="modal-content">
  <span class="close" onclick="closeModal('loginModal')">&times;</span>
- <img src="images/b2blogo.png" alt="B2B Manager Logo" class="site-logo" style="display:block; margin:0 auto 20px; width:200px;">
+ <img src="images/b2blogo.png" alt="B2B Manager Logo" class="site-logo" style="display:block; margin:0 auto 20px; width:100px;">
 
  <form id="loginForm" class="auth-form">
  <h2>Login</h2>
@@ -918,7 +918,7 @@
  <span class="close" onclick="closeModal('registerModal')">&times;</span>
 
  <form id="registerForm" class="auth-form">
- <img src="images/b2blogo.png" alt="B2B Manager Logo" class="site-logo" style="display:block; margin:0 auto 20px; width:200px;">
+ <img src="images/b2blogo.png" alt="B2B Manager Logo" class="site-logo" style="display:block; margin:0 auto 20px; width:100px;">
  <h2>Register</h2>
 
  <div class="form-group">
@@ -965,7 +965,7 @@
 
  <!-- FOOTER -->
  <footer class="landing-footer">
-  
+  <footer>
     <div class="footer-grid">
     
         <div>
@@ -1123,24 +1123,6 @@ function typeAnimation() {
 
 // Run every 200ms
 setInterval(typeAnimation, 200);
-document.addEventListener("DOMContentLoaded", function () {
-
-    console.log("INDEX PAGE LOADED"); // 👈 debug
-
-    const urlParams2 = new URLSearchParams(window.location.search);
-
-    if (urlParams2.get("showLogin") === "true") {
-        console.log("Opening login modal"); // 👈 debug
-
-        openModal("loginModal");
-
-        const email = urlParams2.get("email");
-        if (email) {
-            document.getElementById("loginEmail").value = email;
-        }
-    }
-
-});
  </script>
  <script src="js/auth.js"></script>
 </body>

@@ -60,8 +60,6 @@ function displayProducts() {
                 <h4>${product.name}</h4>
                 <p>Stock: ${product.stock}</p>
                 <p>Supplier: ${supplierName}</p>
-                <p>Price: ₹${product.price}</p>
-                <p>GST: ${product.gst}%</p> 
             `;
 
             if (approvedSuppliers.includes(supplierId)) {
