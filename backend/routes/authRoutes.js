@@ -16,12 +16,6 @@ router.get("/", (req, res) => {
 router.post("/register", async (req, res) => {
   const { name, email, password, role, productTypes } = req.body;
 
-  // Check if user already exists
-  const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    return res.status(400).json({ message: "User already exists with this email" });
-  }
-
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const user = new User({
@@ -39,7 +33,7 @@ router.post("/register", async (req, res) => {
   }
 
   await user.save();
-  res.json({ message: "User registered successfully" });
+  res.json({ message: "User registered" });
 });
 
 // LOGIN
@@ -96,13 +90,14 @@ router.get("/google/callback",
     );
     
     // Direct Redirection Logic: exactly as requested.
-  const baseUrl = "http://127.0.0.1:5502/frontend";
+    const baseUrl = "http://127.0.0.1:5500/WT_TEAM_PROJECT_1/frontend";
+
     if (!req.user.role) {
       // Unregistered user (no role): redirect directly to choose-role.html
       res.redirect(`${baseUrl}/choose-role.html?token=${token}`);
     } else if (req.user.role === "retailer" || req.user.role === "small-scale") {
       // Retailer: redirect directly to buyer pages
-      res.redirect(`${baseUrl}/page2-products.html?token=${token}&role=${req.user.role}`);
+      res.redirect(`${baseUrl}/page2-dashboard.html?token=${token}&role=${req.user.role}`);
     } else {
       // Wholesaler/Manufacturer: redirect directly to seller pages
       res.redirect(`${baseUrl}/page1-dashboard.html?token=${token}&role=${req.user.role}`);
