@@ -110,7 +110,7 @@ async function createPurchaseInvoice() {
     const rows = document.querySelectorAll('.product-row');
 
     if (!date || !supplierId) {
-        showToast('Please select a date and supplier', 'error');
+        alert('Please select a date and supplier');
         return;
     }
 
@@ -139,7 +139,7 @@ async function createPurchaseInvoice() {
     });
 
     if (items.length === 0) {
-        showToast('Please add at least one product', 'error');
+        alert('Please add at least one product');
         return;
     }
 
@@ -156,11 +156,11 @@ async function createPurchaseInvoice() {
 
     const data = await res.json();
     if (!res.ok) {
-        showToast(data.message || 'Failed to create invoice', 'error');
+        alert(data.message || 'Failed to create invoice');
         return;
     }
 
-    showToast('Purchase invoice created successfully! Supplier will receive the order.', 'success');
+    alert('Purchase invoice created successfully! Supplier will receive the order.');
     window.location.href = 'page2-invoices.html';
 }
 

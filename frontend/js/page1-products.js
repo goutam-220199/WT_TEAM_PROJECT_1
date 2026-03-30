@@ -127,11 +127,11 @@ const Products = {
         const data = await res.json();
 
         if (!res.ok) {
-            showToast(data.message || "Failed to add product", "error");
+            alert(data.message || "Failed to add product");
             return false;
         }
 
-        showToast("Product added successfully!", "success");
+        alert("Product added successfully!");
 
         await this.loadProducts();
 
@@ -164,11 +164,11 @@ const Products = {
         });
 
         if (!res.ok) {
-            showToast("Update failed", "error");
+            alert("Update failed");
             return false;
         }
 
-        showToast("Product updated successfully!", "success");
+        alert("Product updated successfully!");
 
         await this.loadProducts();
 
@@ -192,7 +192,7 @@ const Products = {
 
         });
 
-        showToast("Product deleted successfully!", "success");
+        alert("Product deleted successfully!");
 
         this.loadProducts();
     },

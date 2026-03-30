@@ -150,7 +150,7 @@ async function requestSupplier(supplierId){
     const alreadyRequested = (requests || []).some(r => r.supplier?._id === supplierId || r.supplier === supplierId);
 
     if (alreadyRequested) {
-      showToast("You have already requested this supplier", "error");
+      alert("You have already requested this supplier");
       return;
     }
   } catch (err) {
@@ -172,12 +172,12 @@ async function requestSupplier(supplierId){
   const data = await res.json();
 
   if (!res.ok) {
-    showToast(data.message || "Failed to send request", "error");
+    alert(data.message || "Failed to send request");
     console.error("Supplier request failed", data);
     return;
   }
 
-  showToast(data.message || "Request sent");
+  alert(data.message || "Request sent");
 
   // remove supplier card immediately
   const card = document.getElementById(`supplier-${supplierId}`);
@@ -231,7 +231,7 @@ async function addToCart(productId, supplierId, name, price, gst, stock){
   const allowed = approved.some(s => s.supplier._id === supplierId);
 
   if(!allowed){
-    showToast("Supplier not approved yet","error");
+    alert("Supplier not approved yet");
     return;
   }
 

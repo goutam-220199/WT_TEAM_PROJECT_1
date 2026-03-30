@@ -212,7 +212,7 @@ const rows=document.querySelectorAll('.product-row');
 
 if(!customerName){
 
-showToast("Enter customer name","error");
+alert("Enter customer name");
 
 return;
 
@@ -247,7 +247,7 @@ quantity:qty
 
 }
 
-showToast("Invoice created successfully","success");
+alert("Invoice created successfully");
 
 cancelInvoice();
 

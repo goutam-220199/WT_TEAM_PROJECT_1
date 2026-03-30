@@ -152,7 +152,7 @@ headers:{ Authorization:"Bearer "+token }
 if(!res.ok) throw new Error("Approve failed");
 
 if(typeof showToast === "function"){
-showToast("Retailer request approved","success");
+alert("Retailer request approved");
 }
 
 Notifications.loadRequests();
@@ -187,7 +187,7 @@ headers:{ Authorization:"Bearer "+token }
 if(!res.ok) throw new Error("Reject failed");
 
 if(typeof showToast === "function"){
-showToast("Retailer request rejected","success");
+alert("Retailer request rejected");
 }
 
 Notifications.loadRequests();

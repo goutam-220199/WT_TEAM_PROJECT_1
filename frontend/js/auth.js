@@ -73,7 +73,7 @@ const Auth = {
             const data = await res.json();
 
             if (!res.ok) {
-                showToast(data.message || "Registration failed", "error");
+                alert(data.message || "Registration failed");
                 return false;
             }
 
@@ -91,7 +91,7 @@ window.location.href = "index.html?showLogin=true&email=" + encodeURIComponent(e
 return true;
 
         } catch (err) {
-            showToast("Server error", "error");
+            alert("Server error");
             return false;
         }
     },
@@ -141,7 +141,7 @@ return true;
             return true;
 
         } catch (err) {
-            showToast("Server error", "error");
+            alert("Server error");
             return false;
         }
     },
