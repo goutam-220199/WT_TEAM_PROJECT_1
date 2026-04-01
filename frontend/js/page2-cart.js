@@ -140,16 +140,15 @@ async function orderProduct(index) {
     }
 
     if (data.order && data.order.status === 'low_stock') {
-      showToast('Stock is low for this product. Order not placed.', 'error');
+      window.alert('Stock is low for this product. Order not placed.');
       return;
     }
 
     cart.splice(index, 1);
     saveCart(cart);
     renderCart();
-
-    showToast('Order placed successfully.', 'success');
-  } catch (err) {
+    window.alert('Order placed successfully!');
+    } catch (err) {
     console.error(err);
     window.alert('Failed to place order. Please try again later.');
     }
@@ -216,70 +215,6 @@ async function placeOrder() {
   const failed = results.filter(r => !r.success);
   if (failed.length) {
     alert('Some orders failed due to low stock or errors.');
-  }
-}
-
-async function placeOrder() {
-  const cart = getCart();
-  if (cart.length === 0) {
-    showToast('Add items to cart before placing an order', 'error');
-    return;
-  }
-
-  const groupedBySupplier = cart.reduce((groups, item) => {
-    if (!groups[item.supplierId]) groups[item.supplierId] = [];
-    groups[item.supplierId].push(item);
-    return groups;
-  }, {});
-
-  const token = localStorage.getItem('token');
-  const results = [];
-
-  for (const supplierId in groupedBySupplier) {
-    const items = groupedBySupplier[supplierId].map(item => ({
-      product: item.productId,
-      quantity: item.quantity,
-      price: item.price,
-      gst: item.gst,
-      total: (item.price * item.quantity) + ((item.price * item.gst / 100) * item.quantity)
-    }));
-
-    try {
-      const res = await fetch('http://localhost:5000/api/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + token
-        },
-        body: JSON.stringify({ supplierId, items })
-      });
-      const data = await res.json();
-
-      if (!res.ok || (data.order && data.order.status === 'low_stock')) {
-        results.push({ supplierId, success: false, message: data.message || 'Stock low or order failed' });
-        continue;
-      }
-
-      results.push({ supplierId, success: true, orderId: data.order._id });
-    } catch (err) {
-      console.error(err);
-      results.push({ supplierId, success: false, message: 'Network error' });
-    }
-  }
-
-  // Remove successfully ordered items from cart
-  const failedSuppliers = results.filter(r => !r.success).map(r => r.supplierId);
-  const updatedCart = cart.filter(item => failedSuppliers.includes(item.supplierId));
-  saveCart(updatedCart);
-  renderCart();
-
-  if (results.some(r => r.success)) {
-    showToast('Order(s) placed successfully.', 'success');
-  }
-
-  const failed = results.filter(r => !r.success);
-  if (failed.length) {
-    showToast('Some orders failed due to low stock or errors.', 'error');
   }
 }
 

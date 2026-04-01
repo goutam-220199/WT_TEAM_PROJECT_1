@@ -24,7 +24,6 @@ async function loadProducts() {
     allProducts = await res.json();
     displayProducts();
 }
-
 function displayProducts() {
     const container = document.getElementById("productsContainer");
     container.innerHTML = "";
@@ -60,6 +59,8 @@ function displayProducts() {
                 <h4>${product.name}</h4>
                 <p>Stock: ${product.stock}</p>
                 <p>Supplier: ${supplierName}</p>
+                <p>Price: ₹${product.price}</p>
+                <p>GST: ${product.gst}%</p> 
             `;
 
             if (approvedSuppliers.includes(supplierId)) {
@@ -95,7 +96,8 @@ function addToCart(product) {
         });
     }
     localStorage.setItem("cart", JSON.stringify(cart));
-    showToast("Added to cart", "success");
+    alert("Added to cart");
+    window.location.href='page2-cart.html';
 }
 
 function ensureRetailerPage() {
