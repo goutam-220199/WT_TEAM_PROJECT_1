@@ -42,9 +42,9 @@ WT_TEAM_PROJECT_1
 │
 ├── backend/
 │   └── server-side code
+        database/
+│           └── database schema and queries
 │
-├── database/
-│   └── database schema and queries
 │
 └── README.md
 ```
