@@ -28,7 +28,7 @@ const Orders = {
         
         const productsHtml = order.items.map(i => `
             <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 4px 0;">
-                <span>${i.name} (x${i.quantity})</span>
+                <span>${i.product?.name || i.name || 'Unknown Product'} (x${i.quantity})</span>
                 <span>₹${(i.total || i.price * i.quantity).toFixed(2)}</span>
             </div>
         `).join('');

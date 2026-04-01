@@ -577,7 +577,7 @@ const Reports = {
 window.generateReport = async function () {
     await Reports.loadComparisonChart();
     await Reports.downloadReport();
-    showToast("Report generated successfully", "success");
+    alert("Report generated successfully");
 };
 
 
@@ -593,6 +593,6 @@ if (generateBtn) {
     generateBtn.addEventListener('click', async function () {
         await Reports.loadComparisonChart();
         await Reports.downloadReport();
-        showToast("Report generated successfully", "success");
+        alert("Report generated successfully");
     });
 }

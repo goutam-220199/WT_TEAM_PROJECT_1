@@ -51,10 +51,22 @@ router.post("/", authMiddleware, async (req, res) => {
 
     const orderStatus = hasInsufficientStock ? "low_stock" : "approved";
 
+    const normalizedItems = items.map(item => {
+      const productId = item.product || item.productId;
+      return {
+        product: productId,
+        name: item.name || "",
+        quantity: item.quantity,
+        price: item.price,
+        gst: item.gst,
+        total: item.total
+      };
+    });
+
     const order = new Order({
       retailer: req.user.id,
       supplier: supplierId,
-      items,
+      items: normalizedItems,
       status: orderStatus,
       lowStockAlert: triggersLowStockAlert || hasInsufficientStock
     });
@@ -64,7 +76,7 @@ router.post("/", authMiddleware, async (req, res) => {
     if (!hasInsufficientStock) {
       // Auto-approve logic: Deduct stock and Create Invoices
       await Promise.all(order.items.map(async item => {
-        const product = await Product.findById(item.product);
+        const product = await Product.findById(item.product || item.productId);
         if (!product) return;
 
         // Reduce stock

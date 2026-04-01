@@ -58,11 +58,14 @@ body {
     color: var(--primary-color);
     margin-bottom: 8px;
     letter-spacing: -0.5px;
-    border: 3px solid #000;          /* border */
-    background-color: #fff;          /* optional clean background */
-    box-shadow: 0 6px 15px rgba(0,0,0,0.1); /* soft shadow */
+    border: 3px solid #000;
+    /* border */
+    background-color: #fff;
+    /* optional clean background */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    /* soft shadow */
 
-   transition: var(--transition);
+    transition: var(--transition);
 }
 
 .tagline {
@@ -274,7 +277,9 @@ body {
     letter-spacing: 0.5px;
     border-radius: 4px;
     transition: var(--transition);
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     position: relative;
 }
 
@@ -283,9 +288,25 @@ body {
     color: var(--primary-color);
 }
 
+.nav-link:hover svg {
+    color: var(--primary-color);
+}
+
 .nav-link.active {
     background-color: var(--primary-color);
     color: var(--secondary-color);
+}
+
+.nav-link.active svg {
+    color: var(--secondary-color);
+    fill: currentColor;
+}
+
+.nav-link svg {
+    display: inline;
+    vertical-align: middle;
+    flex-shrink: 0;
+    transition: var(--transition);
 }
 
 .nav-link.active::after {
@@ -1374,6 +1395,7 @@ select {
     color: #333;
     line-height: 1.4;
 }
+
 .site-logo {
     width: 400px;
     max-width: 90%;
@@ -1381,9 +1403,12 @@ select {
     display: block;
     padding: 10px;
     border-radius: 50px;
-    border: 3px solid #000;          /* border */
-    background-color: #fff;          /* optional clean background */
-    box-shadow: 0 6px 15px rgba(0,0,0,0.1); /* soft shadow */
-  
+    border: 3px solid #000;
+    /* border */
+    background-color: #fff;
+    /* optional clean background */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    /* soft shadow */
+
     transition: var(--transition);
-  }
+}

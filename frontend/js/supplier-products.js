@@ -7,7 +7,7 @@ async function loadSupplier() {
     const urlParams = new URLSearchParams(window.location.search);
     const supplierId = urlParams.get('supplierId');
     if (!supplierId) {
-        showToast('Supplier ID not found', 'error');
+        alert('Supplier ID not found');
         return;
     }
 
@@ -127,7 +127,7 @@ function addToCart(productId, supplierId, name, price, gst, stock, category = 'G
         });
     }
     localStorage.setItem("cart", JSON.stringify(cart));
-    showToast("Added to cart", "success");
+    alert("Added to cart");
 }
 
 async function init() {
